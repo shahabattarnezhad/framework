@@ -12,9 +12,16 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
     }
 
+    
 
     public IEnumerable<Company> GetAll(bool trackChanges) =>
                                 FindAll(trackChanges).
                                 OrderBy(c => c.Name).
                                 ToList();
+
+
+    public Company? Get(Guid entityId, bool trackChanges) =>
+                   FindByCondition(entity => 
+                   entity.Id.Equals(entityId), trackChanges).
+                   SingleOrDefault();
 }

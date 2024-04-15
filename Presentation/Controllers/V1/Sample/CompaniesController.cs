@@ -15,11 +15,19 @@ public class CompaniesController : ControllerBase
     [HttpGet]
     public IActionResult GetCompanies()
     {
-        //throw new Exception("Exception");
-
         var results =
                 _service.CompanyService.GetAll(trackChanges: false);
 
         return Ok(results);
+    }
+
+
+    [HttpGet("{id:guid}")]
+    public IActionResult GetCompany(Guid id)
+    {
+        var result =
+            _service.CompanyService.Get(id, trackChanges: false);
+
+        return Ok(result);
     }
 }
