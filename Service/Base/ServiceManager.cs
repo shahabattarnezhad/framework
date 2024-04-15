@@ -1,4 +1,5 @@
-﻿using Contracts.Base;
+﻿using AutoMapper;
+using Contracts.Base;
 using Contracts.Logging;
 using Service.Contracts.Base;
 using Service.Contracts.Interfaces;
@@ -13,13 +14,14 @@ public sealed class ServiceManager : IServiceManager
 
 
     public ServiceManager(IRepositoryManager repositoryManager,
-                          ILoggerManager logger)
+                          ILoggerManager logger,
+                          IMapper mapper)
     {
         _companyService = new Lazy<ICompanyService>(() => 
-                          new CompanyService(repositoryManager, logger));
+                          new CompanyService(repositoryManager, logger, mapper));
 
         _employeeService = new Lazy<IEmployeeService>(() => 
-                           new EmployeeService(repositoryManager, logger));
+                           new EmployeeService(repositoryManager, logger, mapper));
     }
 
 
