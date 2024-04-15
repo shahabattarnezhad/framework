@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Repository.cs.Data;
+using Repository.Data;
 
 namespace Api.Utilities.ContextFactory;
 

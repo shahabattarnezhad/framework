@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
-    <ProjectReference Include="..\Repository.cs\Repository.cs.csproj" />
+    <ProjectReference Include="..\Repository.cs\Repository.csproj" />
   </ItemGroup>
 
 </Project>

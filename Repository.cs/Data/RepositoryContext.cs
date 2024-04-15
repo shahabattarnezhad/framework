@@ -1,9 +1,9 @@
 ﻿using Entities.Models.Sample;
 using Microsoft.EntityFrameworkCore;
-using Repository.cs.Configuration.DataSeeding;
-using Repository.cs.Configuration.ModelsConfig.Sample;
+using Repository.Configuration.DataSeeding;
+using Repository.Configuration.ModelsConfig.Sample;
 
-namespace Repository.cs.Data;
+namespace Repository.Data;
 
 public class RepositoryContext : DbContext
 {

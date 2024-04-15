@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Repository.cs.Configuration.DataSeeding;
+namespace Repository.Configuration.DataSeeding;
 
 public class EmployeeSeeding : IEntityTypeConfiguration<Employee>
 {
