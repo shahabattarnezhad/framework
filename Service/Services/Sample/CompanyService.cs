@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Contracts.Base;
 using Contracts.Logging;
+using Entities.Exceptions.Sample.Company;
+using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Company;
 
@@ -39,7 +41,8 @@ internal sealed class CompanyService : ICompanyService
         var entity =
             _repository.Company.Get(entityId, trackChanges);
 
-        //Check if the company is null
+        if (entity is null) 
+            throw new CompanyNotFoundException(entityId);
 
         var entityDto =
             _mapper.Map<CompanyDto>(entity);
