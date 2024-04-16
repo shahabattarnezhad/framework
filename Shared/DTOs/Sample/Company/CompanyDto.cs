@@ -4,7 +4,7 @@ namespace Shared.DTOs.Sample.Company;
 
 public class CompanyDto : BaseEntityDto<Guid>
 {
-    public string? Name { get; set; }
+    public string? Name { get; init; }
 
-    public string? Address { get; set; }
+    public string? Address { get; init; }
 }

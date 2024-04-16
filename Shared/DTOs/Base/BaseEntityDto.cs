@@ -2,5 +2,5 @@
 
 public class BaseEntityDto<T> where T : struct
 {
-    public T Id { get; set; }
+    public T Id { get; init; }
 }
