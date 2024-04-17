@@ -24,4 +24,7 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
                    FindByCondition(entity => 
                    entity.Id.Equals(entityId), trackChanges).
                    SingleOrDefault();
+
+
+    public void CreateEntity(Company company) => Create(company);
 }

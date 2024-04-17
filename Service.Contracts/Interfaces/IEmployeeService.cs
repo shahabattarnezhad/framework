@@ -7,4 +7,8 @@ public interface IEmployeeService
     IEnumerable<EmployeeDto> GetAll(Guid companyId, bool trackChanges);
 
     EmployeeDto Get(Guid companyId, Guid id, bool trackChanges);
+
+    EmployeeDto CreateEmployeeForCompany(Guid companyId,
+                                         EmployeeForCreationDto employeeForCreation,
+                                         bool trackChanges);
 }

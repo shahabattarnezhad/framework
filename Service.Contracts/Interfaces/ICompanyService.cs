@@ -7,4 +7,6 @@ public interface ICompanyService
     IEnumerable<CompanyDto> GetAll(bool trackChanges);
 
     CompanyDto Get(Guid entityId, bool trackChanges);
+
+    CompanyDto Create(CompanyForCreationDto company);
 }

@@ -7,4 +7,6 @@ public interface IEmployeeRepository
     IEnumerable<Employee> GetAll(Guid companyId, bool trackChanges);
 
     Employee? Get(Guid companyId, Guid id, bool trackChanges);
+
+    void CreateEmployeeForCompany(Guid companyId, Employee employee);
 }

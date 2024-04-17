@@ -7,4 +7,6 @@ public interface ICompanyRepository
     IEnumerable<Company> GetAll(bool trackChanges);
 
     Company? Get(Guid entityId, bool trackChanges);
+
+    void CreateEntity(Company company);
 }
