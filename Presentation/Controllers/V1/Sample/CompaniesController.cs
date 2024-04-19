@@ -47,4 +47,29 @@ public class CompaniesController : ControllerBase
             id = createdCompany.Id
         }, createdCompany);
     }
+
+
+    [HttpGet("collection/({ids})", Name = "CompanyCollection")]
+    public IActionResult GetCompanyCollection(IEnumerable<Guid> ids)
+    {
+        var entities =
+            _service.CompanyService.GetByIds(ids, trackChanges: false);
+
+        return Ok(entities);
+    }
+
+
+    [HttpPost("collection")]
+    public IActionResult CreateCompanyCollection(
+        [FromBody] IEnumerable<CompanyForCreationDto> entityCollection)
+    {
+        var result =
+            _service.CompanyService.CreateEntityCollection(entityCollection);
+
+        return CreatedAtRoute("CompanyCollection", new
+        {
+            result.ids
+        },
+        result.entities);
+    }
 }
