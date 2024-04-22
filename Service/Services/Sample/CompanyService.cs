@@ -110,4 +110,27 @@ internal sealed class CompanyService : ICompanyService
 
         return (companies: entityCollectionToReturn, ids: ids);
     }
+
+
+    public void Delete(Guid companyId, bool trackChanges)
+    {
+        var entity =
+            _repository.Company.Get(companyId, trackChanges);
+
+        if (entity is null)
+            throw new CompanyNotFoundException(companyId);
+
+        var hasEntityAnyChild =
+                _repository.Employee.GetAll(companyId, trackChanges);
+
+        if (hasEntityAnyChild.Count() > 0)
+        {
+            throw new EntityCannotBeDeletedException();
+        }
+        else
+        {
+            _repository.Company.DeleteEntity(entity);
+            _repository.Save();
+        }
+    }
 }

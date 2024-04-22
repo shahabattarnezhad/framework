@@ -33,4 +33,7 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
 
         Create(employee);
     }
+
+
+    public void DeleteEntity(Employee employee) => Delete(employee);
 }

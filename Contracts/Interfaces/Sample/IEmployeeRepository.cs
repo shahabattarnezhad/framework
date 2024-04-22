@@ -9,4 +9,6 @@ public interface IEmployeeRepository
     Employee? Get(Guid companyId, Guid id, bool trackChanges);
 
     void CreateEmployeeForCompany(Guid companyId, Employee employee);
+
+    void DeleteEntity(Employee employee);
 }

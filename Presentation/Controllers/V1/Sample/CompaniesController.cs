@@ -74,4 +74,13 @@ public class CompaniesController : ControllerBase
         },
         result.entities);
     }
+
+
+    [HttpDelete("{id:guid}")]
+    public IActionResult DeleteCompany(Guid id) 
+    { 
+        _service.CompanyService.Delete(id, trackChanges: false);
+
+        return NoContent();
+    }
 }

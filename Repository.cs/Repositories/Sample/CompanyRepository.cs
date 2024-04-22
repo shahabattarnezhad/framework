@@ -33,4 +33,7 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
         FindByCondition(x => 
                                  ids.Contains(x.Id), trackChanges)
                                     .ToList();
+
+
+    public void DeleteEntity(Company company) => Delete(company);
 }

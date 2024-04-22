@@ -19,6 +19,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         builder.HasMany(entity => entity.Employees)
                .WithOne(x => x.Company)
-               .HasForeignKey(x => x.CompanyId);
+               .HasForeignKey(x => x.CompanyId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

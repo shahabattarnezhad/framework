@@ -11,4 +11,6 @@ public interface ICompanyRepository
     Company? Get(Guid entityId, bool trackChanges);
 
     void CreateEntity(Company company);
+
+    void DeleteEntity(Company company);
 }
