@@ -6,6 +6,7 @@ using Entities.Exceptions.Sample.Company;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Company;
+using System.ComponentModel.Design;
 
 namespace Service.Services.Sample;
 
@@ -52,10 +53,10 @@ internal sealed class CompanyService : ICompanyService
     }
 
 
-    public CompanyDto Create(CompanyForCreationDto company)
+    public CompanyDto Create(CompanyForCreationDto entityForCreation)
     {
         var entity =
-            _mapper.Map<Company>(company);
+            _mapper.Map<Company>(entityForCreation);
 
         _repository.Company.CreateEntity(entity);
         _repository.Save();
@@ -112,16 +113,16 @@ internal sealed class CompanyService : ICompanyService
     }
 
 
-    public void Delete(Guid companyId, bool trackChanges)
+    public void Delete(Guid entityId, bool trackChanges)
     {
         var entity =
-            _repository.Company.Get(companyId, trackChanges);
+            _repository.Company.Get(entityId, trackChanges);
 
         if (entity is null)
-            throw new CompanyNotFoundException(companyId);
+            throw new CompanyNotFoundException(entityId);
 
         var hasEntityAnyChild =
-                _repository.Employee.GetAll(companyId, trackChanges);
+                _repository.Employee.GetAll(entityId, trackChanges);
 
         if (hasEntityAnyChild.Count() > 0)
         {
@@ -132,5 +133,21 @@ internal sealed class CompanyService : ICompanyService
             _repository.Company.DeleteEntity(entity);
             _repository.Save();
         }
+    }
+
+
+    public void Update(Guid entityId,
+                       CompanyForUpdateDto entityForUpdate,
+                       bool trackChanges)
+    {
+        var entity =
+            _repository.Company.Get(entityId, trackChanges); 
+        
+        if (entity is null) 
+            throw new CompanyNotFoundException(entityId); 
+        
+        _mapper.Map(entityForUpdate, entity);
+        
+        _repository.Save();
     }
 }

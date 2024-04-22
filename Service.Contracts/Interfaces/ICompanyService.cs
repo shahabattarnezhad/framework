@@ -10,10 +10,12 @@ public interface ICompanyService
 
     CompanyDto Get(Guid entityId, bool trackChanges);
 
-    CompanyDto Create(CompanyForCreationDto company);
+    CompanyDto Create(CompanyForCreationDto entityForCreation);
 
     (IEnumerable<CompanyDto> entities, string ids) CreateEntityCollection
         (IEnumerable<CompanyForCreationDto> entityCollection);
 
-    void Delete(Guid companyId, bool trackChanges);
+    void Delete(Guid entityId, bool trackChanges);
+
+    void Update(Guid entityId, CompanyForUpdateDto entityForUpdate, bool trackChanges);
 }
