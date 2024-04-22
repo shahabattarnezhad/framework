@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Company;
 
@@ -50,7 +51,8 @@ public class CompaniesController : ControllerBase
 
 
     [HttpGet("collection/({ids})", Name = "CompanyCollection")]
-    public IActionResult GetCompanyCollection(IEnumerable<Guid> ids)
+    public IActionResult GetCompanyCollection
+        ([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
     {
         var entities =
             _service.CompanyService.GetByIds(ids, trackChanges: false);
