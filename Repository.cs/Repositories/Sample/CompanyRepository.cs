@@ -20,6 +20,12 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
                                 ToList();
 
 
+    public Company? GetDuplicateName(string entityName, bool trackChanges) =>
+                    FindByCondition(entity =>
+                    entity.Name!.Equals(entityName), trackChanges).
+                    SingleOrDefault();
+
+
     public Company? Get(Guid entityId, bool trackChanges) =>
                    FindByCondition(entity => 
                    entity.Id.Equals(entityId), trackChanges).

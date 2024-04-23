@@ -8,6 +8,8 @@ public interface ICompanyRepository
 
     IEnumerable<Company> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
 
+    Company? GetDuplicateName(string entityName, bool trackChanges);
+
     Company? Get(Guid entityId, bool trackChanges);
 
     void CreateEntity(Company company);

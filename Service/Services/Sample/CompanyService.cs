@@ -6,7 +6,6 @@ using Entities.Exceptions.Sample.Company;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Company;
-using System.ComponentModel.Design;
 
 namespace Service.Services.Sample;
 
@@ -38,6 +37,21 @@ internal sealed class CompanyService : ICompanyService
     }
 
 
+    public CompanyDto? GetDuplicateName(string entityName, bool trackChanges)
+    {
+        var entity =
+            _repository.Company.GetDuplicateName(entityName, trackChanges);
+
+        if (entity is not null)
+            throw new CompanyDuplicatedNameException();
+
+        var entityDto =
+            _mapper.Map<CompanyDto>(entity);
+
+        return entityDto;
+    }
+
+
     public CompanyDto Get(Guid entityId, bool trackChanges)
     {
         var entity =
@@ -55,6 +69,8 @@ internal sealed class CompanyService : ICompanyService
 
     public CompanyDto Create(CompanyForCreationDto entityForCreation)
     {
+        GetDuplicateName(entityForCreation.Name!, false);
+
         var entity =
             _mapper.Map<Company>(entityForCreation);
 

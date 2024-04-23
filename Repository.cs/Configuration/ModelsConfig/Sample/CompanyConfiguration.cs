@@ -10,6 +10,9 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
     {
         builder.HasKey(entity => entity.Id);
 
+        builder.HasIndex(entity => entity.Name)
+               .IsUnique();
+
         builder.Property(entity => entity.Name)
                .IsRequired()
                .HasMaxLength(50);
