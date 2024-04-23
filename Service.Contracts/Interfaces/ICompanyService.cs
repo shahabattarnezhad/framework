@@ -1,24 +1,23 @@
-﻿using Entities.Models.Sample;
-using Shared.DTOs.Sample.Company;
+﻿using Shared.DTOs.Sample.Company;
 
 namespace Service.Contracts.Interfaces;
 
 public interface ICompanyService
 {
-    IEnumerable<CompanyDto> GetAll(bool trackChanges);
+    Task<IEnumerable<CompanyDto>> GetAllAsync(bool trackChanges);
 
-    IEnumerable<CompanyDto> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
+    Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
 
-    CompanyDto? GetDuplicateName(string entityName, bool trackChanges);
+    Task<CompanyDto>? GetDuplicateNameAsync(string entityName, bool trackChanges);
 
-    CompanyDto Get(Guid entityId, bool trackChanges);
+    Task<CompanyDto>? GetAsync(Guid entityId, bool trackChanges);
 
-    CompanyDto Create(CompanyForCreationDto entityForCreation);
+    Task<CompanyDto> CreateAsync(CompanyForCreationDto entityForCreation);
 
-    (IEnumerable<CompanyDto> entities, string ids) CreateEntityCollection
+    Task<(IEnumerable<CompanyDto> entities, string ids)> CreateEntityCollectionAsync
         (IEnumerable<CompanyForCreationDto> entityCollection);
 
-    void Delete(Guid entityId, bool trackChanges);
+    Task DeleteAsync(Guid entityId, bool trackChanges);
 
-    void Update(Guid entityId, CompanyForUpdateDto entityForUpdate, bool trackChanges);
+    Task UpdateAsync(Guid entityId, CompanyForUpdateDto entityForUpdate, bool trackChanges);
 }

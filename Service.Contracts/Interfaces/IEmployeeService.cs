@@ -5,27 +5,27 @@ namespace Service.Contracts.Interfaces;
 
 public interface IEmployeeService
 {
-    IEnumerable<EmployeeDto> GetAll(Guid companyId, bool trackChanges);
+    Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId, bool trackChanges);
 
-    EmployeeDto Get(Guid companyId, Guid id, bool trackChanges);
+    Task<EmployeeDto> GetAsync(Guid companyId, Guid id, bool trackChanges);
 
-    EmployeeDto CreateEmployeeForCompany(Guid companyId,
-                                         EmployeeForCreationDto employeeForCreation,
-                                         bool trackChanges);
+    Task<EmployeeDto> CreateEmployeeForCompanyAsync(Guid companyId,
+                                             EmployeeForCreationDto employeeForCreation,
+                                             bool trackChanges);
 
-    void DeleteEmployeeForCompany(Guid companyId, Guid id, bool trackChanges);
+    Task DeleteEmployeeForCompanyAsync(Guid companyId, Guid id, bool trackChanges);
 
-    void UpdateEmployeeForCompany(Guid companyId,
-                                  Guid id,
-                                  EmployeeForUpdateDto entityForUpdate,
-                                  bool companyTrackChanges,
-                                  bool employeeTrackChanges);
+    Task UpdateEmployeeForCompanyAsync(Guid companyId,
+                                       Guid id,
+                                       EmployeeForUpdateDto entityForUpdate,
+                                       bool companyTrackChanges,
+                                       bool employeeTrackChanges);
 
-    (EmployeeForUpdateDto entityToPatch, Employee entity)GetEmployeeForPatch
+    Task<(EmployeeForUpdateDto entityToPatch, Employee entity)> GetEmployeeForPatchAsync
                            (Guid companyId,
                             Guid id,
                             bool companyTrackChanges,
                             bool employeeTrackChanges);
 
-    void SaveChangesForPatch(EmployeeForUpdateDto entityToPatch, Employee entity);
+    Task SaveChangesForPatchAsync(EmployeeForUpdateDto entityToPatch, Employee entity);
 }

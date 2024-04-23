@@ -4,9 +4,9 @@ namespace Contracts.Interfaces.Sample;
 
 public interface IEmployeeRepository
 {
-    IEnumerable<Employee> GetAll(Guid companyId, bool trackChanges);
+    Task<IEnumerable<Employee>> GetAllAsync(Guid companyId, bool trackChanges);
 
-    Employee? Get(Guid companyId, Guid id, bool trackChanges);
+    Task<Employee>? GetAsync(Guid companyId, Guid id, bool trackChanges);
 
     void CreateEmployeeForCompany(Guid companyId, Employee employee);
 

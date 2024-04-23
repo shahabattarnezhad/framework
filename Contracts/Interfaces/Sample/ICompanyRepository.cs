@@ -4,13 +4,13 @@ namespace Contracts.Interfaces.Sample;
 
 public interface ICompanyRepository
 {
-    IEnumerable<Company> GetAll(bool trackChanges);
+    Task<IEnumerable<Company>> GetAllAsync(bool trackChanges);
 
-    IEnumerable<Company> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
+    Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
 
-    Company? GetDuplicateName(string entityName, bool trackChanges);
+    Task<Company>? GetDuplicateNameAsync(string entityName, bool trackChanges);
 
-    Company? Get(Guid entityId, bool trackChanges);
+    Task<Company>? GetAsync(Guid entityId, bool trackChanges);
 
     void CreateEntity(Company company);
 
