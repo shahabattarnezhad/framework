@@ -1,4 +1,5 @@
-﻿using Shared.DTOs.Sample.Employee;
+﻿using Entities.Models.Sample;
+using Shared.DTOs.Sample.Employee;
 
 namespace Service.Contracts.Interfaces;
 
@@ -19,4 +20,12 @@ public interface IEmployeeService
                                   EmployeeForUpdateDto entityForUpdate,
                                   bool companyTrackChanges,
                                   bool employeeTrackChanges);
+
+    (EmployeeForUpdateDto entityToPatch, Employee entity)GetEmployeeForPatch
+                           (Guid companyId,
+                            Guid id,
+                            bool companyTrackChanges,
+                            bool employeeTrackChanges);
+
+    void SaveChangesForPatch(EmployeeForUpdateDto entityToPatch, Employee entity);
 }

@@ -13,6 +13,11 @@
 
 
 	<ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.4" />
+	</ItemGroup>
+
+
+	<ItemGroup>
 	  <ProjectReference Include="..\Service.Contracts\Service.Contracts.csproj" />
 	</ItemGroup>
 
