@@ -103,7 +103,12 @@ public class EmployeesController : ControllerBase
                                                          companyTrackChanges: false,
                                                          employeeTrackChanges: true);
 
-        patchDoc.ApplyTo(result.entityToPatch);
+        patchDoc.ApplyTo(result.entityToPatch, ModelState);
+
+        TryValidateModel(result.entityToPatch);
+
+        if (!ModelState.IsValid) 
+            return UnprocessableEntity(ModelState);
 
         _service.EmployeeService.SaveChangesForPatch(result.entityToPatch,
                                                           result.entity);
