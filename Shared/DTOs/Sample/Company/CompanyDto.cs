@@ -2,7 +2,7 @@
 
 namespace Shared.DTOs.Sample.Company;
 
-public class CompanyDto : BaseEntityDto<Guid>
+public record CompanyDto : BaseEntityDto<Guid>
 {
     public string? Name { get; init; }
 

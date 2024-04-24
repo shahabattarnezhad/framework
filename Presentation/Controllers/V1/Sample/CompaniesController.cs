@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Company;
@@ -35,14 +36,9 @@ public class CompaniesController : ControllerBase
 
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {
-        if (company is null)
-            return BadRequest("CompanyForCreationDto object is null");
-
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
-
         var createdCompany =
             await _service.CompanyService.CreateAsync(company);
 
@@ -89,14 +85,9 @@ public class CompaniesController : ControllerBase
 
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateCompanyAsync(Guid id, [FromBody] CompanyForUpdateDto company)
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
     {
-        if (company is null)
-            return BadRequest("CompanyForUpdateDto object is null");
-
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
-
         await _service.CompanyService.UpdateAsync(id,
                                         company,
                                                     trackChanges: true);

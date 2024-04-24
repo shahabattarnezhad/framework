@@ -1,6 +1,6 @@
 ﻿namespace Shared.DTOs.Base;
 
-public class BaseEntityDto<T> where T : struct
+public record BaseEntityDto<T> where T : struct
 {
     public T Id { get; init; }
 }

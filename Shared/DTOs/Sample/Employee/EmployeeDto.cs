@@ -2,7 +2,7 @@
 
 namespace Shared.DTOs.Sample.Employee;
 
-public class EmployeeDto : BaseEntityDto<Guid>
+public record EmployeeDto : BaseEntityDto<Guid>
 {
     public string? FullName { get; init; }
 
