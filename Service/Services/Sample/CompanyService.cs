@@ -6,6 +6,7 @@ using Entities.Exceptions.Sample.Company;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Company;
+using System.ComponentModel.Design;
 
 namespace Service.Services.Sample;
 
@@ -40,10 +41,7 @@ internal sealed class CompanyService : ICompanyService
     public async Task<CompanyDto>? GetDuplicateNameAsync(string entityName, bool trackChanges)
     {
         var entity =
-            await _repository.Company.GetDuplicateNameAsync(entityName, trackChanges)!;
-
-        if (entity is not null)
-            throw new CompanyDuplicatedNameException();
+            await GetCompanyByNameAndCheckIfItExists(entityName, trackChanges)!;
 
         var entityDto =
             _mapper.Map<CompanyDto>(entity);
@@ -55,10 +53,7 @@ internal sealed class CompanyService : ICompanyService
     public async Task<CompanyDto>? GetAsync(Guid entityId, bool trackChanges)
     {
         var entity =
-            await _repository.Company.GetAsync(entityId, trackChanges)!;
-
-        if (entity is null)
-            throw new CompanyNotFoundException(entityId);
+            await GetCompanyAndCheckIfItExists(entityId, trackChanges);
 
         var entityDto =
             _mapper.Map<CompanyDto>(entity);
@@ -132,23 +127,12 @@ internal sealed class CompanyService : ICompanyService
     public async Task DeleteAsync(Guid entityId, bool trackChanges)
     {
         var entity =
-            await _repository.Company.GetAsync(entityId, trackChanges)!;
+            await GetCompanyAndCheckIfItExists(entityId, trackChanges);
 
-        if (entity is null)
-            throw new CompanyNotFoundException(entityId);
+        await GetCompanyAndCheckIfItHasAnyChild(entityId, trackChanges);
 
-        var hasEntityAnyChild =
-                await _repository.Employee.GetAllAsync(entityId, trackChanges);
-
-        if (hasEntityAnyChild.Count() > 0)
-        {
-            throw new EntityCannotBeDeletedException();
-        }
-        else
-        {
-            _repository.Company.DeleteEntity(entity);
-            await _repository.SaveAsync();
-        }
+        _repository.Company.DeleteEntity(entity);
+        await _repository.SaveAsync();
     }
 
 
@@ -157,13 +141,47 @@ internal sealed class CompanyService : ICompanyService
                        bool trackChanges)
     {
         var entity =
-            await _repository.Company.GetAsync(entityId, trackChanges)!;
-
-        if (entity is null)
-            throw new CompanyNotFoundException(entityId);
+            await GetCompanyAndCheckIfItExists(entityId, trackChanges);
 
         _mapper.Map(entityForUpdate, entity);
 
         await _repository.SaveAsync();
+    }
+
+
+    private async Task<Company> GetCompanyAndCheckIfItExists(Guid id, bool trackChanges)
+    {
+        var company =
+            await _repository.Company.GetAsync(id, trackChanges)!;
+
+        if (company is null)
+            throw new CompanyNotFoundException(id);
+
+        return company;
+    }
+
+
+    private async Task<Company> GetCompanyByNameAndCheckIfItExists(string entityName,
+                                                                   bool trackChanges)
+    {
+        var company =
+            await _repository.Company.GetDuplicateNameAsync(entityName, trackChanges)!;
+
+        if (company is not null)
+            throw new CompanyDuplicatedNameException();
+
+        return company!;
+    }
+
+
+    private async Task<IEnumerable<Employee>> GetCompanyAndCheckIfItHasAnyChild(Guid id, bool trackChanges)
+    {
+        var hasEntityAnyChild =
+                await _repository.Employee.GetAllAsync(id, trackChanges);
+
+        if (hasEntityAnyChild.Count() > 0)
+            throw new EntityCannotBeDeletedException();
+
+        return hasEntityAnyChild;
     }
 }
