@@ -31,10 +31,12 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         var entities =
             await FindByCondition(entity =>
                                 entity.CompanyId.Equals(companyId), trackChanges).
-                                FilterEmployees(employeeParameters.MinAge, employeeParameters.MaxAge).
+                                FilterEmployees(employeeParameters.MinAge,
+                                                employeeParameters.MaxAge).
                                 Search(employeeParameters.SearchTerm!).
-                                OrderBy(entity => entity.FullName).
-                                Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize).
+                                Sort(employeeParameters.OrderBy!).
+                                Skip((employeeParameters.PageNumber - 1) *
+                                            employeeParameters.PageSize).
                                 Take(employeeParameters.PageSize).
                                 ToListAsync();
 

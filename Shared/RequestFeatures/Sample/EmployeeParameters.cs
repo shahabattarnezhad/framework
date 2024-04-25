@@ -4,6 +4,8 @@ namespace Shared.RequestFeatures.Sample;
 
 public class EmployeeParameters : RequestParameters
 {
+    public EmployeeParameters() => OrderBy = "fullName";
+
     public uint MinAge { get; set; }
     public uint MaxAge { get; set; } = int.MaxValue;
     
