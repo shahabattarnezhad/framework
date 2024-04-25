@@ -31,10 +31,16 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
             await FindByCondition(entity =>
                                 entity.CompanyId.Equals(companyId), trackChanges).
                                 OrderBy(entity => entity.FullName).
+                                Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize).
+                                Take(employeeParameters.PageSize).
                                 ToListAsync();
 
-        return PagedList<Employee>.ToPagedList(entities,
-                                            employeeParameters.PageNumber,
+        var count = await FindByCondition(entity => 
+        entity.CompanyId.Equals(companyId), trackChanges).CountAsync();
+
+        return new PagedList<Employee>(entities,
+                                             count,
+                                             employeeParameters.PageNumber,
                                              employeeParameters.PageSize);
     }
 
