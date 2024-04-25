@@ -3,6 +3,7 @@ using Entities.Models.Sample;
 using Microsoft.EntityFrameworkCore;
 using Repository.Base;
 using Repository.Data;
+using Repository.Extensions.Sample;
 using Shared.RequestFeatures.Base;
 using Shared.RequestFeatures.Sample;
 
@@ -29,9 +30,9 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     {
         var entities =
             await FindByCondition(entity =>
-                                entity.CompanyId.Equals(companyId) &&
-                                (entity.Age >= employeeParameters.MinAge &&
-                                entity.Age <= employeeParameters.MaxAge), trackChanges).
+                                entity.CompanyId.Equals(companyId), trackChanges).
+                                FilterEmployees(employeeParameters.MinAge, employeeParameters.MaxAge).
+                                Search(employeeParameters.SearchTerm!).
                                 OrderBy(entity => entity.FullName).
                                 Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize).
                                 Take(employeeParameters.PageSize).
