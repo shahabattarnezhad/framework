@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts.Base;
 using Contracts.Logging;
+using Entities.Exceptions.General;
 using Entities.Exceptions.Sample.Company;
 using Entities.Exceptions.Sample.Employee;
 using Entities.Models.Sample;
@@ -60,6 +61,9 @@ internal sealed class EmployeeService : IEmployeeService
                     EmployeeParameters employeeParameters,
                     bool trackChanges)
     {
+        if (!employeeParameters.ValidAgeRange) 
+            throw new MaxAgeRangeBadRequestException();
+
         await CheckIfCompanyExists(companyId, trackChanges);
 
         var entitiesWithMetaData =

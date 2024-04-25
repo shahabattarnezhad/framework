@@ -29,7 +29,9 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     {
         var entities =
             await FindByCondition(entity =>
-                                entity.CompanyId.Equals(companyId), trackChanges).
+                                entity.CompanyId.Equals(companyId) &&
+                                (entity.Age >= employeeParameters.MinAge &&
+                                entity.Age <= employeeParameters.MaxAge), trackChanges).
                                 OrderBy(entity => entity.FullName).
                                 Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize).
                                 Take(employeeParameters.PageSize).
