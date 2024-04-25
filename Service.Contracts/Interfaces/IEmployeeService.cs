@@ -1,11 +1,16 @@
 ﻿using Entities.Models.Sample;
 using Shared.DTOs.Sample.Employee;
+using Shared.RequestFeatures.Sample;
 
 namespace Service.Contracts.Interfaces;
 
 public interface IEmployeeService
 {
     Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId, bool trackChanges);
+
+    Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId,
+                                               EmployeeParameters employeeParameters,
+                                               bool trackChanges);
 
     Task<EmployeeDto> GetAsync(Guid companyId, Guid id, bool trackChanges);
 

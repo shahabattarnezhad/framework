@@ -1,10 +1,16 @@
 ﻿using Entities.Models.Sample;
+using Shared.RequestFeatures.Sample;
 
 namespace Contracts.Interfaces.Sample;
 
 public interface IEmployeeRepository
 {
-    Task<IEnumerable<Employee>> GetAllAsync(Guid companyId, bool trackChanges);
+    Task<IEnumerable<Employee>> GetAllAsync(Guid companyId,
+                                            EmployeeParameters employeeParameters,
+                                            bool trackChanges);
+
+    Task<IEnumerable<Employee>> GetAllAsync(Guid companyId,
+                                            bool trackChanges);
 
     Task<Employee>? GetAsync(Guid companyId, Guid id, bool trackChanges);
 

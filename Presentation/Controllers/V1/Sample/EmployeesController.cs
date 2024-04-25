@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Employee;
+using Shared.RequestFeatures.Sample;
 
 namespace Presentation.Controllers.V1.Sample;
 
@@ -16,10 +17,11 @@ public class EmployeesController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId,
+        [FromQuery] EmployeeParameters employeeParameters)
     {
-        var results = await _service
-            .EmployeeService.GetAllAsync(companyId, trackChanges: false);
+        var results = await _service.EmployeeService
+            .GetAllAsync(companyId, employeeParameters, trackChanges: false);
 
         return Ok(results);
     }

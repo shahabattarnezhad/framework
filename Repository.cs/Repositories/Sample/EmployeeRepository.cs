@@ -3,6 +3,7 @@ using Entities.Models.Sample;
 using Microsoft.EntityFrameworkCore;
 using Repository.Base;
 using Repository.Data;
+using Shared.RequestFeatures.Sample;
 
 namespace Repository.Repositories.Sample;
 
@@ -14,11 +15,22 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     }
 
 
-    public async Task<IEnumerable<Employee>> GetAllAsync(Guid companyId, bool trackChanges) =>
-                       await FindByCondition(entity =>
-                       entity.CompanyId.Equals(companyId), trackChanges).
-                       OrderBy(entity => entity.FullName).
-                       ToListAsync();
+    public async Task<IEnumerable<Employee>> GetAllAsync(Guid companyId,
+        bool trackChanges) =>
+        await FindByCondition(entity =>
+        entity.CompanyId.Equals(companyId), trackChanges).
+        OrderBy(entity => entity.FullName).
+        ToListAsync();
+
+
+    public async Task<IEnumerable<Employee>> GetAllAsync(Guid companyId,
+        EmployeeParameters employeeParameters, bool trackChanges) =>
+        await FindByCondition(entity =>
+        entity.CompanyId.Equals(companyId), trackChanges).
+        OrderBy(entity => entity.FullName).
+        Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize).
+        Take(employeeParameters.PageSize).
+        ToListAsync();
 
 
     public async Task<Employee>? GetAsync(Guid companyId, Guid id, bool trackChanges) =>
