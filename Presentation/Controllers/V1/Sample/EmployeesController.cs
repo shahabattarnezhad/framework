@@ -4,6 +4,7 @@ using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Sample;
+using System.Text.Json;
 
 namespace Presentation.Controllers.V1.Sample;
 
@@ -20,10 +21,13 @@ public class EmployeesController : ControllerBase
     public async Task<IActionResult> GetEmployeesForCompany(Guid companyId,
         [FromQuery] EmployeeParameters employeeParameters)
     {
-        var results = await _service.EmployeeService
-            .GetAllAsync(companyId, employeeParameters, trackChanges: false);
-
-        return Ok(results);
+        var pagedResult = await _service.
+            EmployeeService.GetAllAsync(companyId, employeeParameters, trackChanges: false);
+        
+        Response.Headers.Add("X-Pagination",
+            JsonSerializer.Serialize(pagedResult.metaData));
+        
+        return Ok(pagedResult.employees);
     }
 
 

@@ -6,6 +6,7 @@ using Entities.Exceptions.Sample.Employee;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Employee;
+using Shared.RequestFeatures.Base;
 using Shared.RequestFeatures.Sample;
 
 namespace Service.Services.Sample;
@@ -54,21 +55,22 @@ internal sealed class EmployeeService : IEmployeeService
     }
 
 
-    public async Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId,
-                                                    EmployeeParameters employeeParameters,
-                                                            bool trackChanges)
+    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)>
+        GetAllAsync(Guid companyId,
+                    EmployeeParameters employeeParameters,
+                    bool trackChanges)
     {
         await CheckIfCompanyExists(companyId, trackChanges);
 
-        var entitiesFromDb =
+        var entitiesWithMetaData =
             await _repository.Employee.GetAllAsync(companyId,
                                                    employeeParameters,
                                                    trackChanges);
 
         var entitiesDto =
-            _mapper.Map<IEnumerable<EmployeeDto>>(entitiesFromDb);
+            _mapper.Map<IEnumerable<EmployeeDto>>(entitiesWithMetaData);
 
-        return entitiesDto;
+        return (employees: entitiesDto, metaData: entitiesWithMetaData.MetaData)!;
     }
 
 
