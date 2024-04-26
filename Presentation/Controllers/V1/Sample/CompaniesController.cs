@@ -3,6 +3,8 @@ using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Company;
+using Shared.RequestFeatures.Sample;
+using System.Text.Json;
 
 namespace Presentation.Controllers.V1.Sample;
 
@@ -16,12 +18,17 @@ public class CompaniesController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetCompanies()
+    public async Task<IActionResult> GetCompanies(
+        [FromQuery] CompanyParameters companyParameters)
     {
-        var results =
-                await _service.CompanyService.GetAllAsync(trackChanges: false);
+        var pagedResult = await _service
+            .CompanyService.GetAllAsync(companyParameters,
+                                                      trackChanges: false);
 
-        return Ok(results);
+        Response.Headers.Add("X-Pagination",
+            JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.entities);
     }
 
 

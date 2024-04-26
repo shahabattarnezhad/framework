@@ -8,11 +8,9 @@ using Entities.Exceptions.Sample.Employee;
 using Entities.Models.Base;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
-using Service.DataShaping;
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Base;
 using Shared.RequestFeatures.Sample;
-using System.Dynamic;
 
 namespace Service.Services.Sample;
 

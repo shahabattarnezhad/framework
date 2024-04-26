@@ -1,10 +1,16 @@
-﻿using Shared.DTOs.Sample.Company;
+﻿using Entities.Models.Base;
+using Shared.DTOs.Sample.Company;
+using Shared.RequestFeatures.Base;
+using Shared.RequestFeatures.Sample;
 
 namespace Service.Contracts.Interfaces;
 
 public interface ICompanyService
 {
     Task<IEnumerable<CompanyDto>> GetAllAsync(bool trackChanges);
+
+    Task<(IEnumerable<Entity> entities, MetaData metaData)> GetAllAsync
+        (CompanyParameters entityParameters, bool trackChanges);
 
     Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
 

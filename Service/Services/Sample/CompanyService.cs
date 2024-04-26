@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
 using Contracts.Base;
+using Contracts.DataShaping;
 using Contracts.Logging;
 using Entities.Exceptions.General;
 using Entities.Exceptions.Sample.Company;
+using Entities.Models.Base;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Shared.DTOs.Sample.Company;
-using System.ComponentModel.Design;
+using Shared.RequestFeatures.Base;
+using Shared.RequestFeatures.Sample;
 
 namespace Service.Services.Sample;
 
@@ -15,14 +18,17 @@ internal sealed class CompanyService : ICompanyService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
+    private readonly IDataShaper<CompanyDto> _dataShaper;
 
     public CompanyService(IRepositoryManager repository,
                           ILoggerManager logger,
-                          IMapper mapper)
+                          IMapper mapper,
+                          IDataShaper<CompanyDto> dataShaper)
     {
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
+        _dataShaper = dataShaper;
     }
 
 
@@ -35,6 +41,22 @@ internal sealed class CompanyService : ICompanyService
             _mapper.Map<IEnumerable<CompanyDto>>(entities);
 
         return entitiesDto;
+    }
+
+
+    public async Task<(IEnumerable<Entity> entities, MetaData metaData)> 
+        GetAllAsync(CompanyParameters entityParameters, bool trackChanges)
+    {
+        var entitiesWithMetaData =
+                await _repository.Company.GetAllAsync(entityParameters, trackChanges);
+
+        var entitiesDto =
+            _mapper.Map<IEnumerable<CompanyDto>>(entitiesWithMetaData);
+
+        var shapedData = _dataShaper.ShapeData(entitiesDto,
+            entityParameters.Fields!);
+
+        return (entities: shapedData, metaData: entitiesWithMetaData.MetaData)!;
     }
 
 

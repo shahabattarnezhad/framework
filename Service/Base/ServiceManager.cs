@@ -5,6 +5,7 @@ using Contracts.Logging;
 using Service.Contracts.Base;
 using Service.Contracts.Interfaces;
 using Service.Services.Sample;
+using Shared.DTOs.Sample.Company;
 using Shared.DTOs.Sample.Employee;
 
 namespace Service.Base;
@@ -18,16 +19,20 @@ public sealed class ServiceManager : IServiceManager
     public ServiceManager(IRepositoryManager repositoryManager,
                           ILoggerManager logger,
                           IMapper mapper,
+                          IDataShaper<CompanyDto> companyDataShaper,
                           IDataShaper<EmployeeDto> employeeDataShaper)
     {
         _companyService = new Lazy<ICompanyService>(() => 
-                          new CompanyService(repositoryManager, logger, mapper));
+                          new CompanyService(repositoryManager,
+                                                      logger,
+                                                      mapper,
+                                             companyDataShaper));
 
         _employeeService = new Lazy<IEmployeeService>(() => 
                            new EmployeeService(repositoryManager,
                                                         logger,
                                                         mapper,
-                                                        employeeDataShaper));
+                                               employeeDataShaper));
     }
 
 

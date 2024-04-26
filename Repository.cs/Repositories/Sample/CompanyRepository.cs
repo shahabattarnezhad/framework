@@ -3,6 +3,10 @@ using Entities.Models.Sample;
 using Microsoft.EntityFrameworkCore;
 using Repository.Base;
 using Repository.Data;
+using Repository.Extensions.Sample;
+using Shared.RequestFeatures.Base;
+using Shared.RequestFeatures.Sample;
+using System.ComponentModel.Design;
 
 namespace Repository.Repositories.Sample;
 
@@ -13,7 +17,28 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
     }
 
-    
+
+
+    public async Task<PagedList<Company>> GetAllAsync(CompanyParameters entityParameters,
+                                                bool trackChanges)
+    {
+        var entities = await FindAll(trackChanges).
+                                Search(entityParameters.SearchTerm!).
+                                Sort(entityParameters.OrderBy!).
+                                Skip((entityParameters.PageNumber - 1) *
+                                            entityParameters.PageSize).
+                                Take(entityParameters.PageSize).
+                                ToListAsync();
+
+        var count = await FindAll(trackChanges)
+                             .CountAsync();
+
+        return new PagedList<Company>(entities,
+                                             count,
+                                             entityParameters.PageNumber,
+                                             entityParameters.PageSize);
+    }
+
 
     public async Task<IEnumerable<Company>> GetAllAsync(bool trackChanges) =>
                                             await FindAll(trackChanges).
