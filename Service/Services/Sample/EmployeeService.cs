@@ -5,6 +5,7 @@ using Contracts.Logging;
 using Entities.Exceptions.General;
 using Entities.Exceptions.Sample.Company;
 using Entities.Exceptions.Sample.Employee;
+using Entities.Models.Base;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
 using Service.DataShaping;
@@ -62,7 +63,7 @@ internal sealed class EmployeeService : IEmployeeService
     }
 
 
-    public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)>
+    public async Task<(IEnumerable<Entity> employees, MetaData metaData)>
         GetAllAsync(Guid companyId,
                     EmployeeParameters employeeParameters,
                     bool trackChanges)
