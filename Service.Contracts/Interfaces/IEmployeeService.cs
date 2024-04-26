@@ -2,6 +2,7 @@
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Base;
 using Shared.RequestFeatures.Sample;
+using System.Dynamic;
 
 namespace Service.Contracts.Interfaces;
 
@@ -9,7 +10,7 @@ public interface IEmployeeService
 {
     Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId, bool trackChanges);
 
-    Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetAllAsync
+    Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetAllAsync
                                               (Guid companyId,
                                                EmployeeParameters employeeParameters,
                                                bool trackChanges);

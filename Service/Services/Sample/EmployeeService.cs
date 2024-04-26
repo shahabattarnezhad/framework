@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using Contracts.Base;
+using Contracts.DataShaping;
 using Contracts.Logging;
 using Entities.Exceptions.General;
 using Entities.Exceptions.Sample.Company;
 using Entities.Exceptions.Sample.Employee;
 using Entities.Models.Sample;
 using Service.Contracts.Interfaces;
+using Service.DataShaping;
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Base;
 using Shared.RequestFeatures.Sample;
+using System.Dynamic;
 
 namespace Service.Services.Sample;
 
@@ -17,14 +20,17 @@ internal sealed class EmployeeService : IEmployeeService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
+    private readonly IDataShaper<EmployeeDto> _dataShaper;
 
     public EmployeeService(IRepositoryManager repository,
                            ILoggerManager logger,
-                           IMapper mapper)
+                           IMapper mapper,
+                           IDataShaper<EmployeeDto> dataShaper)
     {
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
+        _dataShaper = dataShaper;
     }
 
     public async Task<EmployeeDto> GetAsync(Guid companyId, Guid id, bool trackChanges)
@@ -56,7 +62,7 @@ internal sealed class EmployeeService : IEmployeeService
     }
 
 
-    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)>
+    public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)>
         GetAllAsync(Guid companyId,
                     EmployeeParameters employeeParameters,
                     bool trackChanges)
@@ -74,7 +80,10 @@ internal sealed class EmployeeService : IEmployeeService
         var entitiesDto =
             _mapper.Map<IEnumerable<EmployeeDto>>(entitiesWithMetaData);
 
-        return (employees: entitiesDto, metaData: entitiesWithMetaData.MetaData)!;
+        var shapedData = _dataShaper.ShapeData(entitiesDto,
+            employeeParameters.Fields!);
+
+        return (employees: shapedData, metaData: entitiesWithMetaData.MetaData)!;
     }
 
 
