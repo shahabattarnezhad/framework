@@ -28,7 +28,7 @@ public class CompaniesController : ControllerBase
     }
 
 
-    [HttpGet]
+    [HttpGet(Name = "GetCompanies")]
     [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetCompanies(
@@ -59,7 +59,7 @@ public class CompaniesController : ControllerBase
     }
 
 
-    [HttpPost]
+    [HttpPost(Name = "CreateCompany")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {

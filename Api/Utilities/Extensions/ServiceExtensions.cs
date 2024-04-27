@@ -69,6 +69,9 @@ public static class ServiceExtensions
             {
                 systemTextJsonOutputFormatter.SupportedMediaTypes
                 .Add("application/vnd.framework.hateoas+json");
+
+                systemTextJsonOutputFormatter.SupportedMediaTypes
+                .Add("application/vnd.framework.apiroot+json");
             }
 
             var xmlOutputFormatter =
@@ -80,6 +83,9 @@ public static class ServiceExtensions
             {
                 xmlOutputFormatter.SupportedMediaTypes
                 .Add("application/vnd.framework.hateoas+xml");
+
+                xmlOutputFormatter.SupportedMediaTypes
+                .Add("application/vnd.framework.apiroot+xml");
             }
 
         });
