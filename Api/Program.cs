@@ -34,6 +34,7 @@ builder.Services.ConfigureCompanyDataShaper();
 builder.Services.ConfigureEmployeeDataShaper();
 builder.Services.ConfigureCompanyLinks();
 builder.Services.ConfigureEmployeeLinks();
+builder.Services.ConfigureVersioning();
 
 builder.Services.AddControllers(config =>
 {

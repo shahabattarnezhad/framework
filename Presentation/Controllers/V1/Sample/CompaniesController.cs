@@ -1,4 +1,5 @@
-﻿using Entities.Models.LinkModels.Sample;
+﻿using Asp.Versioning;
+using Entities.Models.LinkModels.Sample;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;

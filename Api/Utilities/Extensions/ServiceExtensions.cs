@@ -1,10 +1,13 @@
 ﻿using Api.Utilities.CsvFormat.Sample.Company;
+using Asp.Versioning;
 using Contracts.Base;
 using Contracts.Logging;
 using LoggerService.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Controllers.V1.Sample;
+using Presentation.Controllers.V2;
 using Repository.Base;
 using Repository.Data;
 using Service.Base;
@@ -88,6 +91,34 @@ public static class ServiceExtensions
                 .Add("application/vnd.framework.apiroot+xml");
             }
 
+        });
+    }
+
+
+    public static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(opt =>
+        {
+
+            opt.ReportApiVersions = true;
+            
+            opt.AssumeDefaultVersionWhenUnspecified = true;
+            
+            opt.DefaultApiVersion = new ApiVersion(1, 0);
+
+            opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+
+        })
+        .AddMvc(opt =>
+        { 
+            opt.Conventions.Controller<CompaniesController>()
+            .HasApiVersion(new ApiVersion(1, 0));
+            
+            opt.Conventions.Controller<CompaniesV2Controller>()
+            .HasDeprecatedApiVersion(new ApiVersion(2, 0));
+
+            opt.Conventions.Controller<EmployeesController>()
+            .HasApiVersion(new ApiVersion(1, 0));
         });
     }
 }
