@@ -1,8 +1,8 @@
-﻿using Entities.Models.Base;
+﻿using Entities.Models.LinkModels.Base;
+using Entities.Models.LinkModels.Sample;
 using Entities.Models.Sample;
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Base;
-using Shared.RequestFeatures.Sample;
 
 namespace Service.Contracts.Interfaces;
 
@@ -10,9 +10,9 @@ public interface IEmployeeService
 {
     Task<IEnumerable<EmployeeDto>> GetAllAsync(Guid companyId, bool trackChanges);
 
-    Task<(IEnumerable<Entity> employees, MetaData metaData)> GetAllAsync
+    Task<(LinkResponse linkResponse, MetaData metaData)> GetAllAsync
                                               (Guid companyId,
-                                               EmployeeParameters employeeParameters,
+                                               EmployeeLinkParameters linkParameters,
                                                bool trackChanges);
 
     Task<EmployeeDto> GetAsync(Guid companyId, Guid id, bool trackChanges);

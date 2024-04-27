@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using Entities.Models.LinkModels.Sample;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
@@ -18,16 +19,23 @@ public class EmployeesController : ControllerBase
 
 
     [HttpGet]
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetEmployeesForCompany(Guid companyId,
         [FromQuery] EmployeeParameters employeeParameters)
     {
-        var pagedResult = await _service.
-            EmployeeService.GetAllAsync(companyId, employeeParameters, trackChanges: false);
-        
-        Response.Headers.Add("X-Pagination",
-            JsonSerializer.Serialize(pagedResult.metaData));
-        
-        return Ok(pagedResult.employees);
+        var linkParams = new EmployeeLinkParameters
+            (employeeParameters, HttpContext);
+
+        var result = await _service.EmployeeService
+            .GetAllAsync(companyId, linkParams, trackChanges: false);
+
+        Response.Headers
+            .Add("X-Pagination",
+            JsonSerializer.Serialize(result.metaData));
+
+        return result.linkResponse.HasLinks ?
+            Ok(result.linkResponse.LinkedEntities) :
+            Ok(result.linkResponse.ShapedEntities);
     }
 
 
@@ -65,7 +73,7 @@ public class EmployeesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteEmployeeForCompanyAsync(Guid companyId, Guid id)
     {
-        await _service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, 
+        await _service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId,
                                                                      id,
                                                                      trackChanges: false);
 
@@ -106,7 +114,7 @@ public class EmployeesController : ControllerBase
 
         TryValidateModel(result.entityToPatch);
 
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
         await _service.EmployeeService.SaveChangesForPatchAsync(result.entityToPatch,

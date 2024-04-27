@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts.Base;
 using Contracts.DataShaping;
+using Contracts.Links.Sample;
 using Contracts.Logging;
 using Service.Contracts.Base;
 using Service.Contracts.Interfaces;
@@ -20,19 +21,23 @@ public sealed class ServiceManager : IServiceManager
                           ILoggerManager logger,
                           IMapper mapper,
                           IDataShaper<CompanyDto> companyDataShaper,
-                          IDataShaper<EmployeeDto> employeeDataShaper)
+                          IDataShaper<EmployeeDto> employeeDataShaper,
+                          ICompanyLinks companyLinks,
+                          IEmployeeLinks employeeLinks)
     {
         _companyService = new Lazy<ICompanyService>(() => 
                           new CompanyService(repositoryManager,
                                                       logger,
                                                       mapper,
-                                             companyDataShaper));
+                                             companyDataShaper,
+                                             companyLinks));
 
         _employeeService = new Lazy<IEmployeeService>(() => 
                            new EmployeeService(repositoryManager,
                                                         logger,
                                                         mapper,
-                                               employeeDataShaper));
+                                              employeeDataShaper,
+                                                        employeeLinks));
     }
 
 

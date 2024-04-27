@@ -29,8 +29,11 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.ConfigureCompanyDataShaper();
 builder.Services.ConfigureEmployeeDataShaper();
+builder.Services.ConfigureCompanyLinks();
+builder.Services.ConfigureEmployeeLinks();
 
 builder.Services.AddControllers(config =>
 {
@@ -41,6 +44,8 @@ builder.Services.AddControllers(config =>
     .AddXmlDataContractSerializerFormatters()
     .AddCustomCSVFormatter()
     .AddApplicationPart(typeof(AssemblyReference).Assembly);
+
+builder.Services.AddCustomMediaTypes();
 
 var app = builder.Build();
 

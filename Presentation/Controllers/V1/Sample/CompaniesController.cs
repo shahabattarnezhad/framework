@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities.Models.LinkModels.Sample;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
@@ -18,17 +19,22 @@ public class CompaniesController : ControllerBase
 
 
     [HttpGet]
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetCompanies(
         [FromQuery] CompanyParameters companyParameters)
     {
-        var pagedResult = await _service
-            .CompanyService.GetAllAsync(companyParameters,
-                                                      trackChanges: false);
+        var linkParams = new
+            CompanyLinkParameters(companyParameters, HttpContext);
 
-        Response.Headers.Add("X-Pagination",
-            JsonSerializer.Serialize(pagedResult.metaData));
+        var result = await _service.CompanyService
+            .GetAllAsync(linkParams, trackChanges: false);
 
-        return Ok(pagedResult.entities);
+        Response.Headers
+          .Add("X-Pagination", JsonSerializer.Serialize(result.metaData));
+
+        return result.linkResponse.HasLinks ?
+            Ok(result.linkResponse.LinkedEntities) :
+            Ok(result.linkResponse.ShapedEntities);
     }
 
 

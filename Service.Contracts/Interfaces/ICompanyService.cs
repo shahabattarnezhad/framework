@@ -1,7 +1,7 @@
-﻿using Entities.Models.Base;
+﻿using Entities.Models.LinkModels.Base;
+using Entities.Models.LinkModels.Sample;
 using Shared.DTOs.Sample.Company;
 using Shared.RequestFeatures.Base;
-using Shared.RequestFeatures.Sample;
 
 namespace Service.Contracts.Interfaces;
 
@@ -9,8 +9,8 @@ public interface ICompanyService
 {
     Task<IEnumerable<CompanyDto>> GetAllAsync(bool trackChanges);
 
-    Task<(IEnumerable<Entity> entities, MetaData metaData)> GetAllAsync
-        (CompanyParameters entityParameters, bool trackChanges);
+    Task<(LinkResponse linkResponse, MetaData metaData)> GetAllAsync
+        (CompanyLinkParameters linkParameters, bool trackChanges);
 
     Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
 
