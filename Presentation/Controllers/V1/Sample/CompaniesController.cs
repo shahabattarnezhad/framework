@@ -18,7 +18,18 @@ public class CompaniesController : ControllerBase
     public CompaniesController(IServiceManager service) => _service = service;
 
 
+
+    [HttpOptions] 
+    public IActionResult GetCompaniesOptions()
+    {
+        Response.Headers.Add("Allow", "GET, OPTIONS, POST, PUT, DELETE");
+
+        return Ok();
+    }
+
+
     [HttpGet]
+    [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetCompanies(
         [FromQuery] CompanyParameters companyParameters)
