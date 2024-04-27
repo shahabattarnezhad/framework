@@ -1,6 +1,6 @@
-﻿using Asp.Versioning;
-using Entities.Models.LinkModels.Sample;
+﻿using Entities.Models.LinkModels.Sample;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
@@ -13,6 +13,7 @@ namespace Presentation.Controllers.V1.Sample;
 
 [Route("api/companies")]
 [ApiController]
+[OutputCache(PolicyName = "120SecondsDuration")]
 public class CompaniesController : ControllerBase
 {
     private readonly IServiceManager _service;
@@ -51,6 +52,7 @@ public class CompaniesController : ControllerBase
 
 
     [HttpGet("{id:guid}", Name = "CompanyById")]
+    //[OutputCache(Duration = 60)]
     public async Task<IActionResult> GetCompany(Guid id)
     {
         var result =

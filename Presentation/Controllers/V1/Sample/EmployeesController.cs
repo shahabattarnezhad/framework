@@ -2,6 +2,7 @@
 using Entities.Models.LinkModels.Sample;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Employee;
@@ -13,6 +14,7 @@ namespace Presentation.Controllers.V1.Sample;
 
 [Route("api/companies/{companyId}/employees")]
 [ApiController]
+[OutputCache(PolicyName = "120SecondsDuration")]
 public class EmployeesController : ControllerBase
 {
     private readonly IServiceManager _service;

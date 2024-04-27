@@ -35,6 +35,7 @@ builder.Services.ConfigureEmployeeDataShaper();
 builder.Services.ConfigureCompanyLinks();
 builder.Services.ConfigureEmployeeLinks();
 builder.Services.ConfigureVersioning();
+builder.Services.ConfigureOutputCaching();
 
 builder.Services.AddControllers(config =>
 {
@@ -64,6 +65,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 app.UseCors("CorsPolicy");
+app.UseOutputCache();
 
 app.UseAuthorization();
 

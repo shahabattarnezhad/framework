@@ -101,19 +101,19 @@ public static class ServiceExtensions
         {
 
             opt.ReportApiVersions = true;
-            
+
             opt.AssumeDefaultVersionWhenUnspecified = true;
-            
+
             opt.DefaultApiVersion = new ApiVersion(1, 0);
 
             opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
 
         })
         .AddMvc(opt =>
-        { 
+        {
             opt.Conventions.Controller<CompaniesController>()
             .HasApiVersion(new ApiVersion(1, 0));
-            
+
             opt.Conventions.Controller<CompaniesV2Controller>()
             .HasDeprecatedApiVersion(new ApiVersion(2, 0));
 
@@ -121,4 +121,16 @@ public static class ServiceExtensions
             .HasApiVersion(new ApiVersion(1, 0));
         });
     }
+
+
+    public static void ConfigureResponseCaching(this IServiceCollection services) =>
+        services.AddResponseCaching();
+
+
+    public static void ConfigureOutputCaching(this IServiceCollection services) =>
+        services.AddOutputCache(options =>
+        {
+            options.AddPolicy("120SecondsDuration", p =>
+                     p.Expire(TimeSpan.FromSeconds(120)));
+        });
 }
