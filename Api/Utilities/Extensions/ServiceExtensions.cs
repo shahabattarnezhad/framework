@@ -2,7 +2,9 @@
 using Asp.Versioning;
 using Contracts.Base;
 using Contracts.Logging;
+using Entities.Models.Authentication;
 using LoggerService.Logging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -147,7 +149,7 @@ public static class ServiceExtensions
                 {
 
                     AutoReplenishment = true,
-                    PermitLimit = 5,
+                    PermitLimit = 30,
                     QueueLimit = 2,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                     Window = TimeSpan.FromSeconds(10)
@@ -184,5 +186,21 @@ public static class ServiceExtensions
                 }
             };
         });
+    }
+
+
+    public static void ConfigureIdentity(this IServiceCollection services)
+    {
+        var builder = services.AddIdentity<User, IdentityRole>(option =>
+        {
+            option.Password.RequireDigit = true;
+            option.Password.RequireLowercase = false;
+            option.Password.RequireUppercase = false;
+            option.Password.RequireNonAlphanumeric = false;
+            option.Password.RequiredLength = 6;
+            option.User.RequireUniqueEmail = true;
+        })
+            .AddEntityFrameworkStores<RepositoryContext>()
+            .AddDefaultTokenProviders();
     }
 }

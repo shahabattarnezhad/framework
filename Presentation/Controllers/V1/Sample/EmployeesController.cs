@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Entities.Models.LinkModels.Sample;
+﻿using Entities.Models.LinkModels.Sample;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;

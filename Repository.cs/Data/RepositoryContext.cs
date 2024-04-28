@@ -1,11 +1,15 @@
-﻿using Entities.Models.Sample;
+﻿using Entities.Models.Authentication;
+using Entities.Models.Sample;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Repository.Configuration.DataSeeding;
+using Repository.Configuration.DataSeeding.Authentication;
+using Repository.Configuration.DataSeeding.Sample;
+using Repository.Configuration.ModelsConfig.Authentication;
 using Repository.Configuration.ModelsConfig.Sample;
 
 namespace Repository.Data;
 
-public class RepositoryContext : DbContext
+public class RepositoryContext : IdentityDbContext<User>
 {
     public RepositoryContext(DbContextOptions options) : base(options) { }
 
@@ -13,9 +17,11 @@ public class RepositoryContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
 
+        modelBuilder.ApplyConfiguration(new RoleSeeding());
         modelBuilder.ApplyConfiguration(new CompanySeeding());
         modelBuilder.ApplyConfiguration(new EmployeeSeeding());
     }

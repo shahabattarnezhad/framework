@@ -1,7 +1,6 @@
 ﻿using Entities.Models.LinkModels.Sample;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.AspNetCore.RateLimiting;
 using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;

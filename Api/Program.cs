@@ -37,6 +37,8 @@ builder.Services.ConfigureEmployeeLinks();
 builder.Services.ConfigureVersioning();
 builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureRateLimitingOptions();
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
 
 builder.Services.AddControllers(config =>
 {
@@ -69,6 +71,7 @@ app.UseRateLimiter();
 app.UseCors("CorsPolicy");
 app.UseOutputCache();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

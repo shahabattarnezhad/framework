@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Entities.Models.Authentication;
 using Entities.Models.Sample;
+using Shared.DTOs.Authentication;
 using Shared.DTOs.Sample.Company;
 using Shared.DTOs.Sample.Employee;
 
@@ -9,6 +11,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        CreateMap<User, UserForRegistrationDto>().ReverseMap();
+
         CreateMap<Company, CompanyDto>().ReverseMap();
         CreateMap<Company, CompanyForUpdateDto>().ReverseMap();
         CreateMap<Company, CompanyForCreationDto>().ReverseMap();

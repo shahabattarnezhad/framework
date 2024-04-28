@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Repository.Configuration.DataSeeding;
+namespace Repository.Configuration.DataSeeding.Sample;
 
 public class CompanySeeding : IEntityTypeConfiguration<Company>
 {
