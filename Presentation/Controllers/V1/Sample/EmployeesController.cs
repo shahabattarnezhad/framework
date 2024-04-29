@@ -1,4 +1,5 @@
 ﻿using Entities.Models.LinkModels.Sample;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -14,6 +15,7 @@ namespace Presentation.Controllers.V1.Sample;
 [Route("api/companies/{companyId}/employees")]
 [ApiController]
 [OutputCache(PolicyName = "120SecondsDuration")]
+[Authorize]
 public class EmployeesController : ControllerBase
 {
     private readonly IServiceManager _service;
