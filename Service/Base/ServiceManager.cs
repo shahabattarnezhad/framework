@@ -3,9 +3,10 @@ using Contracts.Base;
 using Contracts.DataShaping;
 using Contracts.Links.Sample;
 using Contracts.Logging;
+using Entities.ConfigurationModels;
 using Entities.Models.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Service.Contracts.Base;
 using Service.Contracts.Interfaces;
 using Service.Contracts.Interfaces.Authentication;
@@ -27,7 +28,7 @@ public sealed class ServiceManager : IServiceManager
                           ILoggerManager logger,
                           IMapper mapper,
                           UserManager<User> userManager,
-                          IConfiguration configuration,
+                          IOptions<JwtConfiguration> configuration,
                           IDataShaper<CompanyDto> companyDataShaper,
                           IDataShaper<EmployeeDto> employeeDataShaper,
                           ICompanyLinks companyLinks,
