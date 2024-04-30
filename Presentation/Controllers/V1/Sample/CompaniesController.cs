@@ -16,6 +16,7 @@ namespace Presentation.Controllers.V1.Sample;
 [ApiController]
 [OutputCache(PolicyName = "120SecondsDuration")]
 [Authorize(Roles = "Manager")]
+[ApiExplorerSettings(GroupName = "v1")]
 //[EnableRateLimiting("SpecificPolicy")] for the whole controller
 public class CompaniesController : ControllerBase
 {
@@ -33,6 +34,12 @@ public class CompaniesController : ControllerBase
     }
 
 
+
+    /// <summary>
+    /// Gets the list of all companies
+    /// </summary>
+    /// <param name="companyParameters"></param>
+    /// <returns>The companies list</returns>
     [HttpGet(Name = "GetCompanies")]
     [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
@@ -67,7 +74,18 @@ public class CompaniesController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Creates a newly created company
+    /// </summary>
+    /// <param name="company"></param>
+    /// <returns>A newly created company</returns>
+    /// <response code="201">Returns the newly created item</response>
+    /// <response code="400">If the item is null</response>
+    /// <response code="422">If the model is invalid</response>
     [HttpPost(Name = "CreateCompany")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(422)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {

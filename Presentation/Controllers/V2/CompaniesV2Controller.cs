@@ -6,6 +6,7 @@ namespace Presentation.Controllers.V2;
 
 [Route("api/companies")]
 [ApiController]
+[ApiExplorerSettings(GroupName = "v2")]
 public class CompaniesV2Controller : ControllerBase
 {
     private readonly IServiceManager _service;
