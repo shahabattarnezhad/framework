@@ -1,4 +1,4 @@
-﻿using Entities.Models.LinkModels.Base;
+﻿using Entities.LinkModels.Base;
 using Microsoft.AspNetCore.Http;
 using Shared.DTOs.Sample.Company;
 

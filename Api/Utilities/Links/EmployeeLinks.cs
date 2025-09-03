@@ -3,7 +3,7 @@ using Contracts.Links.Sample;
 using Entities.Models.Base;
 using Shared.DTOs.Sample.Employee;
 using Microsoft.Net.Http.Headers;
-using Entities.Models.LinkModels.Base;
+using Entities.LinkModels.Base;
 
 namespace Api.Utilities.Links;
 

@@ -2,8 +2,8 @@
 using Contracts.Links.Sample;
 using Entities.Models.Base;
 using Microsoft.Net.Http.Headers;
-using Entities.Models.LinkModels.Base;
 using Shared.DTOs.Sample.Company;
+using Entities.LinkModels.Base;
 
 namespace Api.Utilities.Links;
 

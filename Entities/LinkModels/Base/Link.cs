@@ -1,4 +1,4 @@
-﻿namespace Entities.Models.LinkModels.Base;
+﻿namespace Entities.LinkModels.Base;
 
 public class Link
 {

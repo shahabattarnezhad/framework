@@ -1,5 +1,5 @@
-﻿using Entities.Models.LinkModels.Base;
-using Entities.Models.LinkModels.Sample;
+﻿using Entities.LinkModels.Base;
+using Entities.LinkModels.Sample;
 using Shared.DTOs.Sample.Company;
 using Shared.RequestFeatures.Base;
 

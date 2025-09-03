@@ -1,6 +1,6 @@
-﻿using Entities.Models.LinkModels.Base;
-using Shared.DTOs.Sample.Employee;
+﻿using Shared.DTOs.Sample.Employee;
 using Microsoft.AspNetCore.Http;
+using Entities.LinkModels.Base;
 
 namespace Contracts.Links.Sample;
 

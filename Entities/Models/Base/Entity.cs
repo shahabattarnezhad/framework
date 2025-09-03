@@ -1,4 +1,4 @@
-﻿using Entities.Models.LinkModels.Base;
+﻿using Entities.LinkModels.Base;
 using System.Collections;
 using System.Dynamic;
 using System.Xml;

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Messages.Authentication;
+using System.ComponentModel.DataAnnotations;
 
 namespace Shared.DTOs.Authentication;
 
@@ -8,10 +9,10 @@ public record UserForRegistrationDto
 
     public string? LastName { get; init; }
 
-    [Required(ErrorMessage = "Username is required")]
+    [Required(ErrorMessage = AuthValidationMessage.UsernameValidation)]
     public string? UserName { get; init; }
 
-    [Required(ErrorMessage = "Password is required")]
+    [Required(ErrorMessage = AuthValidationMessage.PasswordValidation)]
     public string? Password { get; init; }
 
     public string? Email { get; init; }

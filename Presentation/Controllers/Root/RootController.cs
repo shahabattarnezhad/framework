@@ -1,4 +1,4 @@
-﻿using Entities.Models.LinkModels.Base;
+﻿using Entities.LinkModels.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
