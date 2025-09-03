@@ -10,11 +10,11 @@ namespace Api.Utilities.Links;
 public class CompanyLinks : ICompanyLinks
 {
     private readonly LinkGenerator _linkGenerator;
-    private readonly IDataShaper<CompanyDto> _dataShaper;
+    private readonly IDataShaper<CompanyDto, Guid> _dataShaper;
 
 
     public CompanyLinks(LinkGenerator linkGenerator,
-                         IDataShaper<CompanyDto> dataShaper)
+                         IDataShaper<CompanyDto, Guid> dataShaper)
     {
         _linkGenerator = linkGenerator;
         _dataShaper = dataShaper;

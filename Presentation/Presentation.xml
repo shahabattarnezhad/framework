@@ -4,6 +4,20 @@
         <name>Presentation</name>
     </assembly>
     <members>
+        <member name="M:Presentation.Controllers.V1.Authentication.RolesController.GetRoles(Shared.RequestFeatures.Authentication.RoleParameters,System.Threading.CancellationToken)">
+            <summary>
+            Gets the list of all roles
+            </summary>
+            <param name="roleParameters"></param>
+            <returns>The roles list</returns>
+        </member>
+        <member name="M:Presentation.Controllers.V1.Authentication.UsersController.GetUsers(Shared.RequestFeatures.Authentication.UserParameters,System.Threading.CancellationToken)">
+            <summary>
+            Gets the list of all users
+            </summary>
+            <param name="userParameters"></param>
+            <returns>The users list</returns>
+        </member>
         <member name="M:Presentation.Controllers.V1.Sample.CompaniesController.GetCompanies(Shared.RequestFeatures.Sample.CompanyParameters)">
             <summary>
             Gets the list of all companies

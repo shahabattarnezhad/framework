@@ -16,9 +16,6 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(entity => entity.Bio)
                .HasMaxLength(300);
 
-        builder.Property(entity => entity.FatherName)
-               .HasMaxLength(50);
-
         builder.Property(entity => entity.ProfilePictureUrl)
                .HasMaxLength(150);
 

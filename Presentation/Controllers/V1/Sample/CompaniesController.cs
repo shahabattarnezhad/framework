@@ -1,4 +1,4 @@
-﻿using Entities.Models.LinkModels.Sample;
+﻿using Entities.LinkModels.Sample;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;

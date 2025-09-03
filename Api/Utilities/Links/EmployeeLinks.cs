@@ -10,11 +10,11 @@ namespace Api.Utilities.Links;
 public class EmployeeLinks : IEmployeeLinks
 {
     private readonly LinkGenerator _linkGenerator;
-    private readonly IDataShaper<EmployeeDto> _dataShaper;
+    private readonly IDataShaper<EmployeeDto, Guid> _dataShaper;
 
 
     public EmployeeLinks(LinkGenerator linkGenerator,
-                         IDataShaper<EmployeeDto> dataShaper)
+                         IDataShaper<EmployeeDto, Guid> dataShaper)
     {
         _linkGenerator = linkGenerator;
         _dataShaper = dataShaper;

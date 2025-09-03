@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Authentication;
 
@@ -15,12 +14,35 @@ public class TokenController : ControllerBase
 
 
     [HttpPost("refresh")]
-    [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> Refresh([FromBody] TokenDto tokenDto)
+    public async Task<IActionResult> Refresh()
     {
-        var tokenDtoToReturn = 
+        HttpContext.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+        HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken);
+
+        var tokenDto = new TokenDto(accessToken, refreshToken);
+
+        var tokenDtoToReturn =
             await _service.AuthenticationService.RefreshToken(tokenDto);
 
-        return Ok(tokenDtoToReturn);
+        _service.AuthenticationService.SetTokensInsideCookie(tokenDtoToReturn, HttpContext);
+
+        return Ok();
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        var tokenDto = await _service.AuthenticationService.RefreshToken(HttpContext);
+
+        _service.AuthenticationService.SetTokensInsideCookie(tokenDto, HttpContext);
+
+        return Ok();
+    }
+
+    [HttpGet("is-authenticated")]
+    public IActionResult IsAuthenticated()
+    {
+        var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+        return Ok(isAuthenticated);
     }
 }

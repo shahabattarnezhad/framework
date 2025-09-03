@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Authentication;
@@ -16,8 +18,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto
-                                                                    userForRegistration)
+    public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
         var result =
             await _service.AuthenticationService.RegisterUser(userForRegistration);
@@ -26,8 +27,7 @@ public class AuthenticationController : ControllerBase
         {
             foreach (var error in result.Errors)
             {
-                ModelState.TryAddModelError(error.Code,
-                                     error.Description);
+                ModelState.TryAddModelError(error.Code, error.Description);
             }
 
             return BadRequest(ModelState);
@@ -39,15 +39,67 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> Authenticate([FromBody]
-                                                  UserForAuthenticationDto user)
+    public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
     {
         if (!await _service.AuthenticationService.ValidateUser(user))
             return Unauthorized();
 
-        var tokenDto = 
+        var tokenDto =
             await _service.AuthenticationService.CreateToken(populateExp: true);
 
-        return Ok(tokenDto);
+        _service.AuthenticationService.SetTokensInsideCookie(tokenDto, HttpContext);
+
+        return Ok();
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    //[Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var userName = User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(userName))
+            return Unauthorized();
+
+        var user = await _service.AuthenticationService.GetCurrentUserAsync(userName);
+        if (user == null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        //Response.Cookies.Delete("accessToken");
+        //Response.Cookies.Delete("refreshToken");
+
+        Response.Cookies.Delete("accessToken", new CookieOptions
+        {
+            HttpOnly = true,
+            //Secure = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Path = "/",
+            //Domain = "example.com" // دامنه‌ی واقعی پروژه
+        });
+        Response.Cookies.Delete("refreshToken", new CookieOptions
+        {
+            HttpOnly = true,
+            //Secure = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Path = "/",
+            //Domain = "example.com"
+        });
+
+        return Ok(new { Message = "Logout successful." });
+    }
+
+    [Authorize]
+    [HttpGet("verify")]
+    public IActionResult Verify()
+    {
+        return Ok(new { Message = "Authenticated" });
     }
 }
