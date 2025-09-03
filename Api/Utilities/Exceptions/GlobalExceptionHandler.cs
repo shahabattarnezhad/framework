@@ -13,13 +13,13 @@ public class GlobalExceptionHandler : IExceptionHandler
 
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext,
-                                          Exception exception, 
+                                          Exception exception,
                                           CancellationToken cancellationToken)
     {
         httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         httpContext.Response.ContentType = "application/json";
 
-        var contextFeature = 
+        var contextFeature =
                                 httpContext.Features.Get<IExceptionHandlerFeature>();
 
         if (contextFeature != null)
@@ -28,18 +28,36 @@ public class GlobalExceptionHandler : IExceptionHandler
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
+                ForbiddenException => StatusCodes.Status403Forbidden,
+                UnprocessableEntityException => StatusCodes.Status422UnprocessableEntity,
                 _ => StatusCodes.Status500InternalServerError
             };
 
             _logger.LogError($"Something went wrong: {exception.Message}");
 
-            await httpContext.Response.WriteAsync(new ErrorDetails()
+            //await httpContext.Response.WriteAsync(new ErrorDetails()
+            //{
+
+            //    StatusCode = httpContext.Response.StatusCode,
+            //    Message = contextFeature.Error.Message,
+
+            //}.ToString());
+
+            if (contextFeature.Error is UnprocessableEntityException ue)
             {
+                httpContext.Response.ContentType = "application/json";
+                await httpContext.Response.WriteAsJsonAsync(ue.Errors, cancellationToken);
+            }
+            else
+            {
+                var errorDetails = new ErrorDetails
+                {
+                    StatusCode = httpContext.Response.StatusCode,
+                    Message = contextFeature.Error.Message
+                };
 
-                StatusCode = httpContext.Response.StatusCode,
-                Message = contextFeature.Error.Message,
-
-            }.ToString());
+                await httpContext.Response.WriteAsync(errorDetails.ToString(), cancellationToken);
+            }
         }
 
         return true;

@@ -2,25 +2,27 @@
 using Asp.Versioning;
 using Contracts.Base;
 using Contracts.Logging;
+using Entities.ConfigurationModels;
 using Entities.Models.Authentication;
 using LoggerService.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Presentation.Base;
 using Presentation.Controllers.V1.Sample;
 using Presentation.Controllers.V2;
 using Repository.Base;
 using Repository.Data;
 using Service.Base;
 using Service.Contracts.Base;
-using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Service.Contracts.Interfaces.Authentication;
+using Service.Services.Authentication;
 using System.Text;
-using Entities.ConfigurationModels;
-using Microsoft.OpenApi.Models;
-using Presentation.Base;
+using System.Threading.RateLimiting;
 
 namespace Api.Utilities.Extensions;
 
@@ -30,9 +32,10 @@ public static class ServiceExtensions
         services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", builder =>
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
+            builder.WithOrigins("http://localhost:4200")
                    .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials()
                    .WithExposedHeaders("X-Pagination"));
         });
 
@@ -56,8 +59,23 @@ public static class ServiceExtensions
         services.AddScoped<IServiceManager, ServiceManager>();
 
 
-    public static void ConfigureSqlContext(this IServiceCollection services,
-                                                IConfiguration configuration) =>
+    public static void ConfigureFileService(this IServiceCollection services) =>
+        services.AddScoped<IFileService, FileService>();
+
+
+    public static void ConfigureProfileImageService(this IServiceCollection services) =>
+        services.AddScoped<IUserProfileImageService, UserProfileImageService>();
+
+
+    public static void ConfigureCacheInvalidationService(this IServiceCollection services) =>
+    services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
+
+
+    public static void ConfigureRefreshCacheService(this IServiceCollection services) =>
+    services.AddScoped(typeof(ICacheRefresherService<,>), typeof(CacheRefresherService<,>));
+
+
+    public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
         services.AddDbContext<RepositoryContext>(opts =>
         opts.UseSqlServer(configuration
             .GetConnectionString("SqlConnection")));
@@ -139,8 +157,17 @@ public static class ServiceExtensions
     public static void ConfigureOutputCaching(this IServiceCollection services) =>
         services.AddOutputCache(options =>
         {
+            // Sample: 
             options.AddPolicy("120SecondsDuration", p =>
-                     p.Expire(TimeSpan.FromSeconds(120)));
+            {
+                p.Expire(TimeSpan.FromSeconds(120)).Tag("DefaultCache");
+            });
+
+            // School
+            options.AddEntityCachePolicies<Guid>(
+                entityName: "School",
+                listDuration: TimeSpan.FromMinutes(5),
+                detailDuration: TimeSpan.FromMinutes(10));
         });
 
 
@@ -197,7 +224,7 @@ public static class ServiceExtensions
 
     public static void ConfigureIdentity(this IServiceCollection services)
     {
-        var builder = services.AddIdentity<User, IdentityRole>(option =>
+        var builder = services.AddIdentity<User, Role>(option =>
         {
             option.Password.RequireDigit = true;
             option.Password.RequireLowercase = false;
@@ -211,8 +238,7 @@ public static class ServiceExtensions
     }
 
 
-    public static void ConfigureJWT(this IServiceCollection services,
-                                         IConfiguration configuration)
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtConfiguration = new JwtConfiguration();
 
@@ -244,14 +270,24 @@ public static class ServiceExtensions
                     IssuerSigningKey =
                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = ctx =>
+                    {
+                        ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+                        if (!string.IsNullOrEmpty(accessToken))
+                            ctx.Token = accessToken;
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
     }
 
 
-    public static void AddJwtConfiguration(this IServiceCollection services,
-                                                IConfiguration configuration) =>
-        services
-        .Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+    public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+        services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
 
 
     public static void ConfigureSwagger(this IServiceCollection services)
@@ -283,10 +319,10 @@ public static class ServiceExtensions
                 Version = "v2"
             });
 
-            var xmlFile = 
+            var xmlFile =
                 $"{typeof(AssemblyReference).Assembly.GetName().Name}.xml";
 
-            var xmlPath = 
+            var xmlPath =
                 Path.Combine(AppContext.BaseDirectory, xmlFile);
 
             s.IncludeXmlComments(xmlPath);

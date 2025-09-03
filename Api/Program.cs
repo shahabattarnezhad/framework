@@ -1,6 +1,5 @@
 using Api.Utilities.Exceptions;
 using Api.Utilities.Extensions;
-using Api.Utilities.Extensions.Sample;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -11,14 +10,17 @@ using Presentation.Utilities.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogManager.Setup()
-          .LoadConfigurationFromFile(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
+LogManager.Setup().LoadConfigurationFromFile(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
+builder.Services.ConfigureFileService();
+builder.Services.ConfigureProfileImageService();
+builder.Services.ConfigureCacheInvalidationService();
+builder.Services.ConfigureRefreshCacheService();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -30,10 +32,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
-builder.Services.ConfigureCompanyDataShaper();
-builder.Services.ConfigureEmployeeDataShaper();
-builder.Services.ConfigureCompanyLinks();
-builder.Services.ConfigureEmployeeLinks();
+
+builder.Services.ConfigureAllDataShapers();
+builder.Services.ConfigureAllLinks();
 builder.Services.ConfigureVersioning();
 builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureRateLimitingOptions();
@@ -64,6 +65,7 @@ if (app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRouting();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
