@@ -19,13 +19,13 @@ internal sealed class CompanyService : ICompanyService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
-    private readonly IDataShaper<CompanyDto> _dataShaper;
+    private readonly IDataShaper<CompanyDto, Guid> _dataShaper;
     private readonly ICompanyLinks _companyLinks;
 
     public CompanyService(IRepositoryManager repository,
                           ILoggerManager logger,
                           IMapper mapper,
-                          IDataShaper<CompanyDto> dataShaper,
+                          IDataShaper<CompanyDto, Guid> dataShaper,
                           ICompanyLinks companyLinks)
     {
         _repository = repository;

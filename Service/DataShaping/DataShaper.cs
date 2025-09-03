@@ -4,25 +4,23 @@ using System.Reflection;
 
 namespace Service.DataShaping;
 
-public class DataShaper<T> : IDataShaper<T> where T : class
+public class DataShaper<T, TId> : IDataShaper<T, TId> where T : class
 {
     public PropertyInfo[] Properties { get; set; }
 
     public DataShaper()
     {
-        Properties = typeof(T).GetProperties(BindingFlags.Public | 
-                                                       BindingFlags.Instance);
+        Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
     }
 
-    public IEnumerable<ShapedEntity> ShapeData(IEnumerable<T> entities,
-                                               string fieldsString)
+    public IEnumerable<ShapedEntity<TId>> ShapeData(IEnumerable<T> entities, string fieldsString)
     {
         var requiredProperties = GetRequiredProperties(fieldsString);
 
         return FetchData(entities, requiredProperties);
     }
 
-    public ShapedEntity ShapeData(T entity, string fieldsString)
+    public ShapedEntity<TId> ShapeData(T entity, string fieldsString)
     {
         var requiredProperties = GetRequiredProperties(fieldsString);
 
@@ -41,7 +39,7 @@ public class DataShaper<T> : IDataShaper<T> where T : class
             foreach (var field in fields)
             {
                 var property = Properties
-                    .FirstOrDefault(pi => 
+                    .FirstOrDefault(pi =>
                     pi.Name.Equals(field.Trim(),
                     StringComparison.InvariantCultureIgnoreCase));
 
@@ -59,10 +57,9 @@ public class DataShaper<T> : IDataShaper<T> where T : class
         return requiredProperties;
     }
 
-    private IEnumerable<ShapedEntity> FetchData(IEnumerable<T> entities, 
-        IEnumerable<PropertyInfo> requiredProperties)
+    private IEnumerable<ShapedEntity<TId>> FetchData(IEnumerable<T> entities, IEnumerable<PropertyInfo> requiredProperties)
     {
-        var shapedData = new List<ShapedEntity>();
+        var shapedData = new List<ShapedEntity<TId>>();
 
         foreach (var entity in entities)
         {
@@ -73,10 +70,9 @@ public class DataShaper<T> : IDataShaper<T> where T : class
         return shapedData;
     }
 
-    private ShapedEntity FetchDataForEntity(T entity,
-        IEnumerable<PropertyInfo> requiredProperties)
+    private ShapedEntity<TId> FetchDataForEntity(T entity, IEnumerable<PropertyInfo> requiredProperties)
     {
-        var shapedObject = new ShapedEntity();
+        var shapedObject = new ShapedEntity<TId>();
 
         foreach (var property in requiredProperties)
         {
@@ -84,10 +80,9 @@ public class DataShaper<T> : IDataShaper<T> where T : class
             shapedObject.Entity!.TryAdd(property.Name, objectPropertyValue);
         }
 
-        var objectProperty = entity.GetType()
-                                              .GetProperty("Id");
+        var objectProperty = entity.GetType().GetProperty("Id");
 
-        shapedObject.Id = (Guid)objectProperty!.GetValue(entity)!;
+        shapedObject.Id = (TId)objectProperty!.GetValue(entity)!;
 
         return shapedObject;
     }

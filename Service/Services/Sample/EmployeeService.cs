@@ -20,13 +20,13 @@ internal sealed class EmployeeService : IEmployeeService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
-    private readonly IDataShaper<EmployeeDto> _dataShaper;
+    private readonly IDataShaper<EmployeeDto, Guid> _dataShaper;
     private readonly IEmployeeLinks _employeeLinks;
 
     public EmployeeService(IRepositoryManager repository,
                            ILoggerManager logger,
                            IMapper mapper,
-                           IDataShaper<EmployeeDto> dataShaper,
+                           IDataShaper<EmployeeDto, Guid> dataShaper,
                            IEmployeeLinks employeeLinks)
     {
         _repository = repository;

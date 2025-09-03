@@ -15,6 +15,7 @@ public interface IRepositoryManager
     IRoleRepository Role { get; }
     IRolePermissionRepository RolePermission { get; }
     IUserRoleRepository UserRole { get; }
+    IUserProfileImageRepository ProfileImage { get; }
 
 
     Task SaveAsync(CancellationToken cancellationToken = default);

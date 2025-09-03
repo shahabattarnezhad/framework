@@ -1,4 +1,5 @@
-﻿using Shared.Messages.Authentication;
+﻿using Microsoft.AspNetCore.Http;
+using Shared.Messages.Authentication;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shared.DTOs.Authentication;
@@ -9,6 +10,8 @@ public record UserForRegistrationDto
 
     public string? LastName { get; init; }
 
+    public string? NationalCode { get; init; }
+
     [Required(ErrorMessage = AuthValidationMessage.UsernameValidation)]
     public string? UserName { get; init; }
 
@@ -18,6 +21,8 @@ public record UserForRegistrationDto
     public string? Email { get; init; }
 
     public string? PhoneNumber { get; init; }
+
+    public IFormFile? Image { get; init; }
 
     public ICollection<string>? Roles { get; init; }
 }
