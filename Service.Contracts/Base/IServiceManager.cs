@@ -5,9 +5,14 @@ namespace Service.Contracts.Base;
 
 public interface IServiceManager
 {
-    IAuthenticationService AuthenticationService { get; }
-
+    // Sample:
     ICompanyService CompanyService { get; }
-
     IEmployeeService EmployeeService { get; }
+
+    // Authentication:
+    IAuthenticationService AuthenticationService { get; }
+    IUserService UserService { get; }
+    IRoleService RoleService { get; }
+    IRolePermissionService RolePermissionService { get; }
+    IUserRoleService UserRoleService { get; }
 }
