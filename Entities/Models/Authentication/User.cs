@@ -16,5 +16,7 @@ public class User : IdentityUser
 
     public bool IsActive { get; set; } = true;
 
+    public UserProfileImage? ProfileImage { get; set; }
+
     public ICollection<UserRole>? UserRoles { get; set; }
 }

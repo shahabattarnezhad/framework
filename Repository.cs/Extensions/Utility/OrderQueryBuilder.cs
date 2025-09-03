@@ -8,12 +8,7 @@ public static class OrderQueryBuilder
 {
     public static string CreateOrderQuery<T>(string orderByQueryString)
     {
-        var orderParams = orderByQueryString.Trim()
-                                                    .Split(',');
-
-        var propertyInfos =
-            typeof(T).GetProperties(BindingFlags.Public |
-                                              BindingFlags.Instance);
+        var orderParams = orderByQueryString.Trim().Split(',');
 
         var orderQueryBuilder = new StringBuilder();
 
@@ -22,27 +17,39 @@ public static class OrderQueryBuilder
             if (string.IsNullOrWhiteSpace(param))
                 continue;
 
-            var propertyFromQueryName =
-                        param.Split(" ")[0];
+            var propertyFromQueryName = param.Split(" ")[0];
 
-            var objectProperty = propertyInfos
-                .FirstOrDefault(pi =>
-                pi.Name
-                  .Equals(propertyFromQueryName,
-                  StringComparison.InvariantCultureIgnoreCase));
+            var direction = param.EndsWith(" desc") ? "descending" : "ascending";
 
-            if (objectProperty == null)
+            var parts = propertyFromQueryName.Split('.');
+            Type type = typeof(T);
+            bool valid = true;
+            string propertyPath = "";
+
+            foreach (var part in parts)
+            {
+                var propertyInfo = type.GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (propertyInfo == null)
+                {
+                    valid = false;
+                    break;
+                }
+
+                type = propertyInfo.PropertyType;
+
+                if (string.IsNullOrEmpty(propertyPath))
+                    propertyPath = propertyInfo.Name;
+                else
+                    propertyPath += "." + propertyInfo.Name;
+            }
+
+            if (!valid)
                 continue;
 
-            var direction =
-                param.EndsWith(" desc") ? "descending" : "ascending";
-
-            orderQueryBuilder.
-                Append($"{objectProperty.Name.ToString()} {direction}, ");
+            orderQueryBuilder.Append($"{propertyPath} {direction}, ");
         }
 
-        var orderQuery = orderQueryBuilder.ToString()
-                                                .TrimEnd(',', ' ');
+        var orderQuery = orderQueryBuilder.ToString().TrimEnd(',', ' ');
 
         return orderQuery;
     }
