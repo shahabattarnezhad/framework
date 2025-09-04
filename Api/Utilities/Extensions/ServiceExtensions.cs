@@ -16,6 +16,7 @@ using Presentation.Base;
 using Presentation.Controllers.V1.Authentication;
 using Presentation.Controllers.V1.Sample;
 using Presentation.Controllers.V2;
+using Presentation.Helpers;
 using Repository.Base;
 using Repository.Data;
 using Service.Base;
@@ -139,28 +140,7 @@ public static class ServiceExtensions
         })
         .AddMvc(opt =>
         {
-            // Sample: 
-            opt.Conventions.Controller<CompaniesController>()
-            .HasApiVersion(new ApiVersion(1, 0));
-
-            opt.Conventions.Controller<CompaniesV2Controller>()
-            .HasDeprecatedApiVersion(new ApiVersion(2, 0));
-
-            opt.Conventions.Controller<EmployeesController>()
-            .HasApiVersion(new ApiVersion(1, 0));
-
-            // Current project controllers:
-            opt.Conventions.Controller<AuthenticationController>()
-            .HasApiVersion(new ApiVersion(1, 0));
-
-            opt.Conventions.Controller<RolesController>()
-            .HasApiVersion(new ApiVersion(1, 0));
-
-            opt.Conventions.Controller<TokenController>()
-            .HasApiVersion(new ApiVersion(1, 0));
-
-            opt.Conventions.Controller<UsersController>()
-            .HasApiVersion(new ApiVersion(1, 0));
+            VersioningHelper.ConfigureControllerVersions(opt.Conventions);
         });
     }
 
