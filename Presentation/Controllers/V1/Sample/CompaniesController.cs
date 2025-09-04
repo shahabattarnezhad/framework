@@ -2,24 +2,28 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Presentation.Extensions;
 using Presentation.Utilities.ActionFilters;
 using Presentation.Utilities.ModelBinders;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Company;
 using Shared.RequestFeatures.Sample;
 using System.Text.Json;
+using System.Threading;
 
 namespace Presentation.Controllers.V1.Sample;
 
 
 [Route("api/companies")]
 [ApiController]
-[OutputCache(PolicyName = "120SecondsDuration")]
+//[OutputCache(PolicyName = "120SecondsDuration")]
 [Authorize(Roles = "Manager")]
 [ApiExplorerSettings(GroupName = "v1")]
 //[EnableRateLimiting("SpecificPolicy")] for the whole controller
 public class CompaniesController : ControllerBase
 {
+    private const string EntityName = "Company";
+
     private readonly IServiceManager _service;
     public CompaniesController(IServiceManager service) => _service = service;
 
@@ -43,6 +47,7 @@ public class CompaniesController : ControllerBase
     [HttpGet(Name = "GetCompanies")]
     [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+    [OutputCache(PolicyName = "CompanyListCachePolicy")]
     public async Task<IActionResult> GetCompanies(
         [FromQuery] CompanyParameters companyParameters)
     {
@@ -87,10 +92,19 @@ public class CompaniesController : ControllerBase
     [ProducesResponseType(400)]
     [ProducesResponseType(422)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
+    public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company, CancellationToken cancellationToken)
     {
         var createdCompany =
             await _service.CompanyService.CreateAsync(company);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
+
+        // Invalidate list + detail
+        //await this.InvalidateEntityCacheAsync(EntityName, createdCompany.Id, cancellationToken);
+
+        // Invalidate list + detail + several entities at same time
+        //await this.InvalidateEntitiesCacheAsync(new[] { "User", "Teacher", "Student" }, cancellationToken);
 
         return CreatedAtRoute("CompanyById", new
         {
@@ -112,10 +126,13 @@ public class CompaniesController : ControllerBase
 
     [HttpPost("collection")]
     public async Task<IActionResult> CreateCompanyCollection(
-        [FromBody] IEnumerable<CompanyForCreationDto> entityCollection)
+        [FromBody] IEnumerable<CompanyForCreationDto> entityCollection, CancellationToken cancellationToken)
     {
         var result =
             await _service.CompanyService.CreateEntityCollectionAsync(entityCollection);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return CreatedAtRoute("CompanyCollection", new
         {
@@ -126,9 +143,12 @@ public class CompaniesController : ControllerBase
 
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteCompany(Guid id)
+    public async Task<IActionResult> DeleteCompany(Guid id, CancellationToken cancellationToken)
     {
         await _service.CompanyService.DeleteAsync(id, trackChanges: false);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }
@@ -136,11 +156,15 @@ public class CompaniesController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
+    public async Task<IActionResult> UpdateCompany
+        (Guid id, [FromBody] CompanyForUpdateDto company, CancellationToken cancellationToken)
     {
         await _service.CompanyService.UpdateAsync(id,
                                         company,
                                                     trackChanges: true);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }

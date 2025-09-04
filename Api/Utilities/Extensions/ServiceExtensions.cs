@@ -13,9 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Presentation.Base;
-using Presentation.Controllers.V1.Authentication;
-using Presentation.Controllers.V1.Sample;
-using Presentation.Controllers.V2;
 using Presentation.Helpers;
 using Repository.Base;
 using Repository.Data;
@@ -158,9 +155,13 @@ public static class ServiceExtensions
                 p.Expire(TimeSpan.FromSeconds(120)).Tag("DefaultCache");
             });
 
-            // School
             options.AddEntityCachePolicies<Guid>(
-                entityName: "School",
+                entityName: "Company",
+                listDuration: TimeSpan.FromMinutes(5),
+                detailDuration: TimeSpan.FromMinutes(10));
+
+            options.AddEntityCachePolicies<Guid>(
+                entityName: "Employee",
                 listDuration: TimeSpan.FromMinutes(5),
                 detailDuration: TimeSpan.FromMinutes(10));
         });

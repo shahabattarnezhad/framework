@@ -15,4 +15,18 @@ public interface ICacheInvalidationService
     /// <param name="cancellationToken">Cancellation token</param>
     Task InvalidateEntityCacheAsync<TEntityId>
         (string entityName, TEntityId? entityId = default, CancellationToken cancellationToken = default);
+
+
+    /// <summary>
+    /// Invalidates only the list cache for a given entity type.
+    /// </summary>
+    Task InvalidateEntityCacheAsync(string entityName, CancellationToken cancellationToken = default);
+
+
+    /// <summary>
+    /// Invalidates cache entries for multiple entities at once.
+    /// </summary>
+    /// <param name="entityNames">List of logical entity names (only list cache will be invalidated)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task InvalidateEntitiesCacheAsync(IEnumerable<string> entityNames, CancellationToken cancellationToken = default);
 }

@@ -34,4 +34,23 @@ public class CacheInvalidationService : ICacheInvalidationService
             await _cacheStore.EvictByTagAsync(detailTag, cancellationToken);
         }
     }
+
+    public async Task InvalidateEntityCacheAsync(string entityName, CancellationToken cancellationToken = default)
+    {
+        await InvalidateEntityCacheAsync<object>(entityName, null, cancellationToken);
+    }
+
+    public async Task InvalidateEntitiesCacheAsync(IEnumerable<string> entityNames, CancellationToken cancellationToken = default)
+    {
+        if (entityNames is null)
+            throw new ArgumentNullException(nameof(entityNames));
+
+        foreach (var entityName in entityNames)
+        {
+            if (!string.IsNullOrWhiteSpace(entityName))
+            {
+                await InvalidateEntityCacheAsync(entityName, cancellationToken);
+            }
+        }
+    }
 }
