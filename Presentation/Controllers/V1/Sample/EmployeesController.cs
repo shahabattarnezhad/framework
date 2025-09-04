@@ -3,21 +3,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Presentation.Extensions;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Sample.Employee;
 using Shared.RequestFeatures.Sample;
 using System.Text.Json;
+using System.Threading;
 
 namespace Presentation.Controllers.V1.Sample;
 
 
 [Route("api/companies/{companyId}/employees")]
 [ApiController]
-[OutputCache(PolicyName = "120SecondsDuration")]
+//[OutputCache(PolicyName = "120SecondsDuration")]
 [Authorize]
 public class EmployeesController : ControllerBase
 {
+    private const string EntityName = "Employee";
+
     private readonly IServiceManager _service;
     public EmployeesController(IServiceManager service) => _service = service;
 
@@ -35,6 +39,7 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+    [OutputCache(PolicyName = "EmployeeListCachePolicy")]
     public async Task<IActionResult> GetEmployeesForCompany(Guid companyId,
         [FromQuery] EmployeeParameters employeeParameters)
     {
@@ -67,13 +72,22 @@ public class EmployeesController : ControllerBase
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId,
-                                       [FromBody] EmployeeForCreationDto employee)
+                                       [FromBody] EmployeeForCreationDto employee, CancellationToken cancellationToken)
     {
         var employeeToReturn = await _service
                                                .EmployeeService
                                                .CreateEmployeeForCompanyAsync(companyId,
                                                employee,
                                                trackChanges: false);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
+
+        // Invalidate list + detail
+        //await this.InvalidateEntityCacheAsync(EntityName, employeeToReturn.Id, cancellationToken);
+
+        // Invalidate list + detail + several entities at same time
+        //await this.InvalidateEntitiesCacheAsync(new[] { "User", "Company", "Employee" }, cancellationToken);
 
         return CreatedAtRoute("GetEmployeeForCompany",
             new
@@ -86,11 +100,14 @@ public class EmployeesController : ControllerBase
 
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteEmployeeForCompanyAsync(Guid companyId, Guid id)
+    public async Task<IActionResult> DeleteEmployeeForCompanyAsync(Guid companyId, Guid id, CancellationToken cancellationToken)
     {
         await _service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId,
                                                                      id,
                                                                      trackChanges: false);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }
@@ -100,13 +117,17 @@ public class EmployeesController : ControllerBase
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateEmployeeForCompanyAsync(Guid companyId,
                                                   Guid id,
-                                                  [FromBody] EmployeeForUpdateDto employee)
+                                                  [FromBody] EmployeeForUpdateDto employee, CancellationToken cancellationToken)
     {
         await _service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId,
                                                           id,
                                                           employee,
                                                           companyTrackChanges: false,
                                                           employeeTrackChanges: true);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
+
         return NoContent();
     }
 
@@ -114,7 +135,7 @@ public class EmployeesController : ControllerBase
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> PartiallyUpdateEmployeeForCompanyAsync(Guid companyId,
                                                            Guid id,
-                [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
+                [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc, CancellationToken cancellationToken)
     {
         if (patchDoc is null)
             return BadRequest("patchDoc object sent from client is null.");
@@ -134,6 +155,9 @@ public class EmployeesController : ControllerBase
 
         await _service.EmployeeService.SaveChangesForPatchAsync(result.entityToPatch,
                                                           result.entity);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }

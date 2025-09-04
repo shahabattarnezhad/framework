@@ -25,7 +25,7 @@
             <param name="companyParameters"></param>
             <returns>The companies list</returns>
         </member>
-        <member name="M:Presentation.Controllers.V1.Sample.CompaniesController.CreateCompany(Shared.DTOs.Sample.Company.CompanyForCreationDto)">
+        <member name="M:Presentation.Controllers.V1.Sample.CompaniesController.CreateCompany(Shared.DTOs.Sample.Company.CompanyForCreationDto,System.Threading.CancellationToken)">
             <summary>
             Creates a newly created company
             </summary>
@@ -34,6 +34,21 @@
             <response code="201">Returns the newly created item</response>
             <response code="400">If the item is null</response>
             <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Presentation.Extensions.ControllerCacheExtensions.InvalidateEntityCacheAsync(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Invalidates only the list cache for a given entity (inside controller).
+            </summary>
+        </member>
+        <member name="M:Presentation.Extensions.ControllerCacheExtensions.InvalidateEntityCacheAsync``1(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,``0,System.Threading.CancellationToken)">
+            <summary>
+            Invalidates both list + detail cache for a given entity (inside controller).
+            </summary>
+        </member>
+        <member name="M:Presentation.Extensions.ControllerCacheExtensions.InvalidateEntitiesCacheAsync(Microsoft.AspNetCore.Mvc.ControllerBase,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Invalidates cache for multiple entities (list cache only).
+            </summary>
         </member>
     </members>
 </doc>
