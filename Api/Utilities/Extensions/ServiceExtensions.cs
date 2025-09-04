@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Presentation.Base;
+using Presentation.Controllers.V1.Authentication;
 using Presentation.Controllers.V1.Sample;
 using Presentation.Controllers.V2;
 using Repository.Base;
@@ -138,6 +139,7 @@ public static class ServiceExtensions
         })
         .AddMvc(opt =>
         {
+            // Sample: 
             opt.Conventions.Controller<CompaniesController>()
             .HasApiVersion(new ApiVersion(1, 0));
 
@@ -145,6 +147,19 @@ public static class ServiceExtensions
             .HasDeprecatedApiVersion(new ApiVersion(2, 0));
 
             opt.Conventions.Controller<EmployeesController>()
+            .HasApiVersion(new ApiVersion(1, 0));
+
+            // Current project controllers:
+            opt.Conventions.Controller<AuthenticationController>()
+            .HasApiVersion(new ApiVersion(1, 0));
+
+            opt.Conventions.Controller<RolesController>()
+            .HasApiVersion(new ApiVersion(1, 0));
+
+            opt.Conventions.Controller<TokenController>()
+            .HasApiVersion(new ApiVersion(1, 0));
+
+            opt.Conventions.Controller<UsersController>()
             .HasApiVersion(new ApiVersion(1, 0));
         });
     }

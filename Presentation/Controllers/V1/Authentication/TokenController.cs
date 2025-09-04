@@ -7,6 +7,7 @@ namespace Presentation.Controllers.V1.Authentication;
 
 [Route("api/token")]
 [ApiController]
+[ApiExplorerSettings(GroupName = "v1")]
 public class TokenController : ControllerBase
 {
     private readonly IServiceManager _service;

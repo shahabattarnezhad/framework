@@ -10,6 +10,7 @@ namespace Presentation.Controllers.V1.Authentication;
 
 [Route("api/authentication")]
 [ApiController]
+[ApiExplorerSettings(GroupName = "v1")]
 public class AuthenticationController : ControllerBase
 {
     private readonly IServiceManager _service;
