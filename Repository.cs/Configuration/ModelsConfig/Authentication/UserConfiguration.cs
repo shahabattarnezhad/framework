@@ -15,7 +15,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                .HasMaxLength(50);
 
         builder.Property(entity => entity.NationalCode)
-               .IsRequired()
                .HasMaxLength(10);
 
         builder.HasOne(entity => entity.ProfileImage)
