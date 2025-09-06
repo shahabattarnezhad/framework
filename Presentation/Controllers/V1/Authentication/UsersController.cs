@@ -3,11 +3,14 @@ using Entities.LinkModels.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Presentation.Extensions;
 using Presentation.Utilities.ActionFilters;
 using Service.Contracts.Base;
 using Shared.DTOs.Authentication;
 using Shared.RequestFeatures.Authentication;
 using System.Text.Json;
+using System.Threading;
 
 namespace Presentation.Controllers.V1.Authentication;
 
@@ -20,6 +23,8 @@ namespace Presentation.Controllers.V1.Authentication;
 //[EnableRateLimiting("SpecificPolicy")] for the whole controller
 public class UsersController : ControllerBase
 {
+    private const string EntityName = "User";
+
     private readonly IServiceManager _service;
 
     public UsersController(IServiceManager service) => _service = service;
@@ -44,8 +49,9 @@ public class UsersController : ControllerBase
     [HttpGet(Name = "GetUsers")]
     [HttpHead]
     //[OutputCache(PolicyName = "120SecondsDuration", Tags = new[] { "UserCache" })]
+    [OutputCache(PolicyName = "UserListCachePolicy")]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
-    public async Task<IActionResult> GetUsers([FromQuery] UserParameters userParameters, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsersAsync([FromQuery] UserParameters userParameters, CancellationToken cancellationToken)
     {
         var linkParams = new UserLinkParameters(userParameters, HttpContext);
 
@@ -64,7 +70,7 @@ public class UsersController : ControllerBase
     //[OutputCache(Duration = 60)]
     //[EnableRateLimiting("SpecificPolicy")] for certain endpoint
     //[DisableRateLimiting] for disabling the rate limiting for certain endpoint
-    public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserByIdAsync(string id, CancellationToken cancellationToken)
     {
         var result =
             await _service.UserService.GetByIdAsync(id, false, cancellationToken)!;
@@ -77,7 +83,7 @@ public class UsersController : ControllerBase
     //[OutputCache(Duration = 60)]
     //[EnableRateLimiting("SpecificPolicy")] for certain endpoint
     //[DisableRateLimiting] for disabling the rate limiting for certain endpoint
-    public async Task<IActionResult> GetUserByEmail(string email, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var result =
             await _service.UserService.GetByEmailAsync(email, false, cancellationToken)!;
@@ -90,7 +96,7 @@ public class UsersController : ControllerBase
     //[OutputCache(Duration = 60)]
     //[EnableRateLimiting("SpecificPolicy")] for certain endpoint
     //[DisableRateLimiting] for disabling the rate limiting for certain endpoint
-    public async Task<IActionResult> GetUserByUserName(string username, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserByUserNameAsync(string username, CancellationToken cancellationToken)
     {
         var result =
             await _service.UserService.GetByUserNameAsync(username, false, cancellationToken)!;
@@ -99,7 +105,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpPatch("{userId}")]
-    public async Task<IActionResult> PartiallyUpdateUserAsync(string userId, [FromBody] JsonPatchDocument<UserForPatchDto> patchDoc)
+    public async Task<IActionResult> PartiallyUpdateUserAsync
+        (string userId, [FromBody] JsonPatchDocument<UserForPatchDto> patchDoc, CancellationToken cancellationToken)
     {
         var currentUser =
             _service.AuthenticationService.IsCurrentUser(userId, HttpContext);
@@ -126,36 +133,59 @@ public class UsersController : ControllerBase
 
         await _service.UserService.SaveChangesForPatchAsync(result.entityToPatch, result.entity);
 
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
+
         return NoContent();
     }
 
     [HttpGet("{userId}/roles")]
-    public async Task<IActionResult> GetRolesForUser(string userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetRolesForUserAsync(string userId, CancellationToken cancellationToken)
     {
         var roles = await _service.UserRoleService.GetRolesByUserIdAsync(userId, false, cancellationToken);
 
         return Ok(roles);
     }
 
-    [HttpPost("{userId}/roles/{roleId}")]
-    public async Task<IActionResult> AssignRoleToUser(string userId, string roleId, CancellationToken cancellationToken)
+    [HttpPost("{userId}/rolename/{roleId}")]
+    public async Task<IActionResult> AssignRoleToUserAsync(string userId, string roleId, CancellationToken cancellationToken)
     {
         await _service.UserRoleService.AssignRoleToUserAsync(userId, roleId, cancellationToken);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
+
+        return NoContent();
+    }
+
+
+
+    [HttpPost("{userId}/roles/{roleName}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AssignRoleToUserByRoleNameAsync(string userId, string roleName, CancellationToken cancellationToken)
+    {
+        await _service.AuthenticationService.AssignRoleToUserAsync(userId, roleName, cancellationToken);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }
 
     [HttpDelete("{userId}/roles/{roleId}")]
-    public async Task<IActionResult> RemoveRoleFromUser(string userId, string roleId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveRoleFromUserAsync(string userId, string roleId, CancellationToken cancellationToken)
     {
         await _service.UserRoleService.RemoveRoleFromUserAsync(userId, roleId, cancellationToken);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }
 
     [AllowAnonymous]
     [HttpGet("any-user-exists")]
-    public async Task<IActionResult> AnyUserExists(CancellationToken cancellationToken)
+    public async Task<IActionResult> AnyUserExistsAsync(CancellationToken cancellationToken)
     {
         var exists = await _service.UserService.AnyUserExistsAsync(false, cancellationToken);
         return Ok(exists);
@@ -174,9 +204,12 @@ public class UsersController : ControllerBase
     [HttpPut("{id}")]
     //[HttpPut("{id:string}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> UpdateUser(string id, [FromBody] UserForUpdationDto user)
+    public async Task<IActionResult> UpdateUserAsync(string id, [FromBody] UserForUpdationDto user, CancellationToken cancellationToken)
     {
         await _service.UserService.UpdateAsync(id, user, trackChanges: true);
+
+        // Invalidate list
+        await this.InvalidateEntityCacheAsync(EntityName, cancellationToken);
 
         return NoContent();
     }
