@@ -397,4 +397,26 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         return userDto;
     }
+
+    public async Task AssignRoleToUserAsync(string userId, string roleName, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+            throw new UserNotFoundByIdException(userId);
+
+        var roleExists = await _repository.Role.GetByRoleNameAsync(roleName, false, cancellationToken);
+
+        if (roleExists == null)
+            throw new RoleNotFoundByNameException(roleName);
+
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+
+        if (!result.Succeeded)
+        {
+            var errorMessage = string.Join(" | ", result.Errors.Select(e => e.Description));
+            _logger.LogError($"{nameof(AssignRoleToUserAsync)} failed: {errorMessage}");
+            throw new Exception("Failed to assign role to user.");
+        }
+    }
 }

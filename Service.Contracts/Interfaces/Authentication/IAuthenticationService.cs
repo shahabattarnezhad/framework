@@ -25,4 +25,6 @@ public interface IAuthenticationService
     bool IsCurrentUser(string userId, HttpContext context, CancellationToken cancellationToken = default);
 
     void SetTokensInsideCookie(TokenDto tokenDto, HttpContext context, CancellationToken cancellationToken = default);
+
+    Task AssignRoleToUserAsync(string userId, string roleName, CancellationToken cancellationToken);
 }
