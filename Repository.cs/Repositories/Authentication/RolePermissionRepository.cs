@@ -10,35 +10,44 @@ public class RolePermissionRepository : RepositoryBase<RolePermission>, IRolePer
 {
     public RolePermissionRepository(RepositoryContext context) : base(context) { }
 
-    public async Task<IEnumerable<Permission>> GetPermissionsByRoleIdAsync(string roleId, bool trackChanges, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Permission>> GetPermissionsByRoleIdAsync
+        (string roleId, bool trackChanges, CancellationToken cancellationToken = default)
     {
-        return await RepositoryContext.RolePermissions
-            .Where(rp => rp.RoleId == roleId)
-            .Select(rp => rp.Permission!)
-            .ToListAsync(cancellationToken);
+        return await FindByCondition(rp => rp.RoleId == roleId, trackChanges)
+                     .Include(rp => rp.Permission)
+                     .Select(rp => rp.Permission!)
+                     .ToListAsync(cancellationToken);
     }
 
     public async Task AssignPermissionToRoleAsync(string roleId, Guid permissionId, CancellationToken cancellationToken = default)
     {
-        var exists = await RepositoryContext.RolePermissions
-            .AnyAsync(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, cancellationToken);
+        var exists = await ExistsAsync(roleId, permissionId, cancellationToken);
 
         if (!exists)
         {
-            await RepositoryContext.RolePermissions.AddAsync(new RolePermission
+            var rolePermission = new RolePermission
             {
                 RoleId = roleId,
                 PermissionId = permissionId
-            }, cancellationToken);
+            };
+
+            Create(rolePermission);
         }
     }
 
     public async Task RemovePermissionFromRoleAsync(string roleId, Guid permissionId, CancellationToken cancellationToken = default)
     {
-        var entity = await RepositoryContext.RolePermissions
-            .FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, cancellationToken);
+        var entity =
+            await FindByCondition(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, true)
+                  .FirstOrDefaultAsync(cancellationToken);
 
         if (entity != null)
-            RepositoryContext.RolePermissions.Remove(entity);
+            Delete(entity);
+    }
+
+    public async Task<bool> ExistsAsync(string roleId, Guid permissionId, CancellationToken cancellationToken = default)
+    {
+        return await FindByCondition(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, false)
+                    .AnyAsync(cancellationToken);
     }
 }
