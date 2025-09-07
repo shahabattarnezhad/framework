@@ -15,6 +15,7 @@ public interface IRepositoryManager
     IRoleRepository Role { get; }
     IRolePermissionRepository RolePermission { get; }
     IUserRoleRepository UserRole { get; }
+    IPermissionRepository Permission { get; }
     IUserProfileImageRepository ProfileImage { get; }
 
 

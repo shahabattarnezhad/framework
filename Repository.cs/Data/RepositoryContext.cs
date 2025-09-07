@@ -50,7 +50,6 @@ public class RepositoryContext : IdentityDbContext<
         modelBuilder.ApplyConfiguration(new UserSeeding());
         modelBuilder.ApplyConfiguration(new RoleSeeding());
         modelBuilder.ApplyConfiguration(new UserRoleSeeding());
-        modelBuilder.ApplyConfiguration(new PermissionSeeding());
 
         // Seeding sample:
         modelBuilder.ApplyConfiguration(new CompanySeeding());

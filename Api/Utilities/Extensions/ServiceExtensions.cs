@@ -6,6 +6,8 @@ using Entities.ConfigurationModels;
 using Entities.Models.Authentication;
 using LoggerService.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -16,10 +18,12 @@ using Presentation.Base;
 using Presentation.Helpers;
 using Repository.Base;
 using Repository.Data;
+using Service.Attribute;
 using Service.Base;
 using Service.Contracts.Base;
 using Service.Contracts.Interfaces.Authentication;
 using Service.Services.Authentication;
+using Shared.Constants;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -68,6 +72,9 @@ public static class ServiceExtensions
 
     public static void ConfigureCacheInvalidationService(this IServiceCollection services) =>
     services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
+
+    public static void ConfigurePermissionHandlerService(this IServiceCollection services) =>
+    services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 
     public static void ConfigureRefreshCacheService(this IServiceCollection services) =>
@@ -232,6 +239,16 @@ public static class ServiceExtensions
             .AddEntityFrameworkStores<RepositoryContext>()
             .AddDefaultTokenProviders();
     }
+
+    public static void ConfigureAuthorization(this IServiceCollection services) =>
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in PermissionConstants.AllPermissions)
+            {
+                options.AddPolicy(permission.Name, policy =>
+                policy.Requirements.Add(new OperationAuthorizationRequirement { Name = permission.Name }));
+            }
+        });
 
 
     public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)

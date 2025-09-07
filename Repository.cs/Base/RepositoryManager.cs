@@ -20,6 +20,7 @@ public sealed class RepositoryManager : IRepositoryManager
     private readonly Lazy<IUserRepository> _userRepository;
     private readonly Lazy<IRoleRepository> _roleRepository;
     private readonly Lazy<IRolePermissionRepository> _rolePermissionRepository;
+    private readonly Lazy<IPermissionRepository> _permissionRepository;
     private readonly Lazy<IUserRoleRepository> _userRoleRepository;
     private readonly Lazy<IUserProfileImageRepository> _profileImageRepository;
 
@@ -39,6 +40,8 @@ public sealed class RepositoryManager : IRepositoryManager
         _userRoleRepository = new Lazy<IUserRoleRepository>(() => new UserRoleRepository(repositoryContext));
         _profileImageRepository = new Lazy<IUserProfileImageRepository>
             (() => new UserProfileImageRepository(repositoryContext));
+        _permissionRepository = new Lazy<IPermissionRepository>
+            (() => new PermissionRepository(repositoryContext));
     }
 
     // Sample:
@@ -50,6 +53,7 @@ public sealed class RepositoryManager : IRepositoryManager
     public IRoleRepository Role => _roleRepository.Value;
     public IRolePermissionRepository RolePermission => _rolePermissionRepository.Value;
     public IUserRoleRepository UserRole => _userRoleRepository.Value;
+    public IPermissionRepository Permission => _permissionRepository.Value;
     public IUserProfileImageRepository ProfileImage => _profileImageRepository.Value;
 
 

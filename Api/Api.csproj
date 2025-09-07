@@ -8,13 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="wwwroot\**" />
-	  <Content Remove="wwwroot\**" />
-	  <EmbeddedResource Remove="wwwroot\**" />
-	  <None Remove="wwwroot\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.19" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.19">
@@ -29,6 +22,10 @@
 		<ProjectReference Include="..\Presentation\Presentation.csproj" />
 		<ProjectReference Include="..\Repository.cs\Repository.csproj" />
 		<ProjectReference Include="..\Service\Service.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

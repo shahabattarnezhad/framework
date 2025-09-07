@@ -50,4 +50,29 @@ public class RolePermissionRepository : RepositoryBase<RolePermission>, IRolePer
         return await FindByCondition(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, false)
                     .AnyAsync(cancellationToken);
     }
+
+    public async Task<RolePermission> GetPermissionsAsync
+        (string roleId, Guid permissionId, bool trackChanges, CancellationToken cancellationToken = default)
+    {
+        return await FindByCondition(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, trackChanges)
+                     .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Permission>> GetPermissionsByRoleIdsAsync(
+        IEnumerable<string> roleIds, bool trackChanges, CancellationToken cancellationToken = default)
+    {
+        return await FindByCondition(rp => roleIds.Contains(rp.RoleId!), trackChanges)
+                     .Include(rp => rp.Permission)
+                     .Select(rp => rp.Permission!)
+                     .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Permission>> GetPermissionsByRoleNamesAsync(
+    IEnumerable<string> roleNames, bool trackChanges, CancellationToken cancellationToken = default)
+    {
+        return await FindByCondition(rp => rp.Role != null && roleNames.Contains(rp.Role.Name!), trackChanges)
+                     .Include(rp => rp.Permission)
+                     .Select(rp => rp.Permission!)
+                     .ToListAsync(cancellationToken);
+    }
 }

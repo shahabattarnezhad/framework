@@ -2,9 +2,4 @@
 
 namespace Shared.DTOs.Authentication;
 
-public record PermissionDto : BaseEntityDto<Guid>
-{
-    public string? Name { get; init; }
-
-    public string? DisplayName { get; init; }
-}
+public readonly record struct PermissionDto(Guid Id, string Name, string DisplayName);

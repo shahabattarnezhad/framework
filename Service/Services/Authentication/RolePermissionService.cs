@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Contracts.Base;
+using Entities.Exceptions.Authentication;
+using Entities.Exceptions.General;
 using Service.Contracts.Interfaces.Authentication;
 using Shared.DTOs.Authentication;
 
@@ -27,6 +29,19 @@ internal sealed class RolePermissionService : IRolePermissionService
 
     public async Task AssignPermissionToRoleAsync(string roleId, Guid permissionId, CancellationToken cancellationToken = default)
     {
+        var role = await _repository.Role.GetByIdAsync(roleId, true, cancellationToken);
+        if (role == null)
+            throw new RoleNotFoundByIdException(roleId);
+
+        var permission = await _repository.Permission.GetByIdAsync(permissionId, false, cancellationToken);
+
+        if (permission == null)
+            throw new EntityNotFoundException(permissionId);
+
+        var exists = await _repository.RolePermission.ExistsAsync(roleId, permissionId, cancellationToken);
+        if (exists)
+            return;
+
         await _repository.RolePermission.AssignPermissionToRoleAsync(roleId, permissionId, cancellationToken);
         await _repository.SaveAsync(cancellationToken);
     }

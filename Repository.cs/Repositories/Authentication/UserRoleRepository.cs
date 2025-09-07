@@ -12,33 +12,32 @@ public class UserRoleRepository : RepositoryBase<UserRole>, IUserRoleRepository
 
     public async Task AssignRoleToUserAsync(string userId, string roleId, CancellationToken cancellationToken = default)
     {
-        var exists = await RepositoryContext.UserRoles
-            .AnyAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
+        var exists = await FindByCondition(ur => ur.UserId == userId && ur.RoleId == roleId, false)
+            .AnyAsync(cancellationToken);
 
         if (!exists)
         {
-            await RepositoryContext.UserRoles.AddAsync(new UserRole
+            Create(new UserRole
             {
                 UserId = userId,
                 RoleId = roleId
-            }, cancellationToken);
+            });
         }
     }
 
     public async Task RemoveRoleFromUserAsync(string userId, string roleId, CancellationToken cancellationToken = default)
     {
-        var entity = await RepositoryContext.UserRoles
-            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
+        var entity = await FindByCondition(ur => ur.UserId == userId && ur.RoleId == roleId, true)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (entity != null)
-            RepositoryContext.UserRoles.Remove(entity);
+            Delete(entity);
     }
 
     public async Task<List<Role>> GetRolesByUserIdAsync
         (string userId, bool trackChanges, CancellationToken cancellationToken = default)
     {
-        return await RepositoryContext.UserRoles
-            .Where(ur => ur.UserId == userId)
+        return await FindByCondition(ur => ur.UserId == userId, trackChanges)
             .Select(ur => ur.Role!)
             .ToListAsync(cancellationToken);
     }

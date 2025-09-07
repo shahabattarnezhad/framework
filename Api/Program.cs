@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using NLog;
 using Presentation.Base;
 using Presentation.Utilities.ActionFilters;
+using Repository.Configuration.DataSeeding.Authentication;
+using Repository.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureFileService();
 builder.Services.ConfigureProfileImageService();
 builder.Services.ConfigureCacheInvalidationService();
+builder.Services.ConfigurePermissionHandlerService();
 builder.Services.ConfigureRefreshCacheService();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
@@ -39,6 +42,7 @@ builder.Services.ConfigureVersioning();
 builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureRateLimitingOptions();
 builder.Services.AddAuthentication();
+builder.Services.ConfigureAuthorization();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
@@ -57,6 +61,16 @@ builder.Services.AddControllers(config =>
 builder.Services.AddCustomMediaTypes();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<RepositoryContext>();
+
+    await PermissionSeeder.SeedAsync(context);
+
+    //await RoleSeeder.SeedAsync(context);              // Roles
+    //await RolePermissionSeeder.SeedAsync(context);    // RolePermission
+}
 
 app.UseExceptionHandler(opt => { });
 

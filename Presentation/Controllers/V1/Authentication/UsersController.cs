@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Presentation.Extensions;
 using Presentation.Utilities.ActionFilters;
+using Service.Contracts.Attribute;
 using Service.Contracts.Base;
+using Shared.Constants;
 using Shared.DTOs.Authentication;
 using Shared.RequestFeatures.Authentication;
 using System.Text.Json;
-using System.Threading;
 
 namespace Presentation.Controllers.V1.Authentication;
 
@@ -21,6 +22,10 @@ namespace Presentation.Controllers.V1.Authentication;
 [Authorize(Roles = "Admin")]
 [ApiExplorerSettings(GroupName = "v1")]
 //[EnableRateLimiting("SpecificPolicy")] for the whole controller
+//[HasPermission(PermissionConstants.UsersReadName)]
+//[HasPermission(PermissionConstants.UsersCreateName)]
+//[HasPermission(PermissionConstants.UsersUpdateName)]
+//[HasPermission(PermissionConstants.UsersDeleteName)]
 public class UsersController : ControllerBase
 {
     private const string EntityName = "User";
@@ -46,6 +51,7 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <param name="userParameters"></param>
     /// <returns>The users list</returns>
+    [HasPermission(PermissionConstants.UsersReadName)]
     [HttpGet(Name = "GetUsers")]
     [HttpHead]
     //[OutputCache(PolicyName = "120SecondsDuration", Tags = new[] { "UserCache" })]
@@ -173,6 +179,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{userId}/roles/{roleId}")]
+    [HasPermission(PermissionConstants.UsersDeleteName)]
+
     public async Task<IActionResult> RemoveRoleFromUserAsync(string userId, string roleId, CancellationToken cancellationToken)
     {
         await _service.UserRoleService.RemoveRoleFromUserAsync(userId, roleId, cancellationToken);
@@ -204,6 +212,8 @@ public class UsersController : ControllerBase
     [HttpPut("{id}")]
     //[HttpPut("{id:string}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [HasPermission(PermissionConstants.UsersUpdateName)]
+
     public async Task<IActionResult> UpdateUserAsync(string id, [FromBody] UserForUpdationDto user, CancellationToken cancellationToken)
     {
         await _service.UserService.UpdateAsync(id, user, trackChanges: true);

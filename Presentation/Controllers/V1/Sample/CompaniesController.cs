@@ -17,7 +17,7 @@ namespace Presentation.Controllers.V1.Sample;
 [Route("api/companies")]
 [ApiController]
 //[OutputCache(PolicyName = "120SecondsDuration")]
-[Authorize(Roles = "Manager")]
+[Authorize(Roles = "Admin")]
 [ApiExplorerSettings(GroupName = "v1")]
 //[EnableRateLimiting("SpecificPolicy")] for the whole controller
 public class CompaniesController : ControllerBase
